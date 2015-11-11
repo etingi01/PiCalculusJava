@@ -1,0 +1,12 @@
+<piCalculusProgram>
+<summation>
+<in>x</in>
+<punto></punto>
+<out>x(y)</out>
+<plus></plus>
+<out>x</out>
+</summation>
+<summation>
+<out>y</out>
+</summation>
+</piCalculusProgram>
