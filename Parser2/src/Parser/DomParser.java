@@ -72,7 +72,29 @@ public class DomParser {
 		default: sy=nodeName;
 		break;
 		}
-		Node brCheck=node.getParentNode();
+		NodeList nodeChildren = node.getChildNodes();
+		if (nodeChildren.getLength()==0){
+			Node ancestor = node.getParentNode();
+			Node lastAnc = ancestor.getLastChild();
+			Node prinText = lastAnc.getPreviousSibling();
+			if (prinText.isEqualNode(node)){
+				//System.out.println("mpike edw");
+			while ((!ancestor.getNodeName().equals("brackets"))){
+				
+				ancestor = ancestor.getParentNode();
+				if (ancestor==null)
+					break;
+			}
+			if (ancestor.getNodeName().equals("brackets")){
+				sy = sy + " ) ";
+			}
+			}
+		
+		}
+		
+		
+		
+		/*Node brCheck=node.getParentNode();
 		if (brCheck.getNodeName().equals("brackets")){
 			Node Last = brCheck.getLastChild();
 			Node prinLast = Last.getPreviousSibling();
@@ -82,7 +104,7 @@ public class DomParser {
 			if (node.equals(prinLast)){
 				sy=sy+") ";
 			}
-		}
+		}*/
 		
 		return sy;
 	}
