@@ -1,0 +1,22 @@
+<ThirdProgram>
+	<summation>
+		<new>a</new>
+		<brackets>
+			<summation>
+				<out>b(a)</out>
+				<punto></punto>
+				<S></S>
+			</summation>
+			<concurrency></concurrency>
+			<summation>
+				<R></R>
+			</summation>
+		</brackets>
+	</summation>
+	<concurrency></concurrency>
+	<summation>
+		<in>b(c)</in>
+		<punto></punto>
+		<P></P>
+	</summation>
+</ThirdProgram>
