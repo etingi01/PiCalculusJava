@@ -5,7 +5,11 @@ import org.xml.sax.SAXException;
 
 import javax.xml.parsers.*;
 import java.io.*;
-
+/*DomParser 
+ * Class that is used to parse the xml file.
+ * Contains the structure that contains the xml tree (doc)
+ * Contains the root node of the tree (rootNode)
+ */
 public class DomParser {
 	private Document doc;
 	private Node rootNode;
@@ -18,6 +22,10 @@ public class DomParser {
     rootNode = doc.getDocumentElement();
 	}
 	
+	/* PrintXML: Prints the XML tree.
+	 * Recursive Function
+	 * Takes the tree's root node and a null String
+	 */
 	public void printXML(Node nNode, String spaces){
 		spaces= spaces + " ";
 		System.out.println(spaces + nNode.getNodeName());
@@ -33,6 +41,11 @@ public class DomParser {
         
 	}	
         
+	
+	/* Method that converts the xml structure in Pi-Calculus model.
+	 * It uses the method decideSymbol for every node of the Tree.
+	 * It is a recursive method that passes the tree using DFS
+	 */
 	public void printPi(Node nNode, String spaces, int n){
 		//System.out.println(spaces + nNode.getNodeName());
 		//System.out.println(nNode.getNodeName() + spaces);
@@ -50,12 +63,16 @@ public class DomParser {
         	}    	
         }
 	}	
-	
+	/* decideSymbol() based on the name of node
+	 * return the right String that should be printed
+	 * in the PiCalculus form.
+	 * Then, there are some steps to print the closing brackets correctly.
+	 */
 	public String decideSymbol(Node node){
 		String sy;
 		String nodeName = node.getNodeName();
 		switch (nodeName){
-		case "concurrency": sy="|";
+		case "concurrency": sy=" | ";
 		break;
 		case "punto": sy=".";
 		break;
@@ -69,43 +86,51 @@ public class DomParser {
 		break;
 		case "summation":sy="";
 		break;
+		case "plus": sy= " + ";
+		break;
 		default: sy=nodeName;
 		break;
 		}
+		//System.out.println("Eimaste sto" + node.getNodeName());
 		NodeList nodeChildren = node.getChildNodes();
-		if (nodeChildren.getLength()==0){
+		int numChildText = 0;
+		//if (nodeChildren.getLength()!=0)
+		//System.out.println("exei paidia: " +nodeChildren.item(0).getNodeName());
+		for (int i = 0; i<nodeChildren.getLength(); i++) {
+			  Node e = nodeChildren.item(i);
+			   if (e.getNodeName().equals("#text")) {
+				   numChildText++;
+			   }
+		}
+		if ((nodeChildren.getLength()==0)||(numChildText==nodeChildren.getLength())){
+		//	System.out.println(node.getNodeName());
+			//System.out.println("mpike edw");
 			Node ancestor = node.getParentNode();
 			Node lastAnc = ancestor.getLastChild();
 			Node prinText = lastAnc.getPreviousSibling();
+			//System.out.println(node.getNodeName());
+			//System.out.println(prinText.getNodeName());
 			if (prinText.isEqualNode(node)){
 				//System.out.println("mpike edw");
-			while ((!ancestor.getNodeName().equals("brackets"))){
+			while ((!ancestor.isEqualNode(rootNode))){
+				if (ancestor.isEqualNode(rootNode))
+					break;
+				if (ancestor.getNodeName().equals("brackets")){
+					sy = sy + " ) ";
+				}
+				Node ancestor2 = ancestor.getParentNode();
+				lastAnc = ancestor2.getLastChild();
+				prinText = lastAnc.getPreviousSibling();
+				if (!(prinText.isEqualNode(ancestor)))
+					break;
 				
 				ancestor = ancestor.getParentNode();
-				if (ancestor==null)
-					break;
+				
 			}
-			if (ancestor.getNodeName().equals("brackets")){
-				sy = sy + " ) ";
-			}
+			
 			}
 		
-		}
-		
-		
-		
-		/*Node brCheck=node.getParentNode();
-		if (brCheck.getNodeName().equals("brackets")){
-			Node Last = brCheck.getLastChild();
-			Node prinLast = Last.getPreviousSibling();
-			System.out.println(prinLast.getNodeName());
-			NodeList nList = brCheck.getChildNodes(); 
-			int sizeList=nList.getLength();
-			if (node.equals(prinLast)){
-				sy=sy+") ";
-			}
-		}*/
-		
+		}		
 		return sy;
 	}
 	

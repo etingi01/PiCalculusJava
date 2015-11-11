@@ -6,6 +6,7 @@
 <plus></plus>
 <out>x</out>
 </summation>
+<concurrency></concurrency>
 <summation>
 <out>y</out>
 </summation>

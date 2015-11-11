@@ -1,0 +1,15 @@
+<SixthProgram>
+		<in>a(b)</in>
+		<punto></punto>
+		<brackets>
+				<in>b(a)</in>
+			<concurrency></concurrency>
+			<brackets>
+					<out>x(z)</out>
+					<punto></punto>
+					<in>z(b)</in>
+				<concurrency></concurrency>
+					<out>b(z)</out>
+		</brackets>
+		</brackets>
+</SixthProgram>
