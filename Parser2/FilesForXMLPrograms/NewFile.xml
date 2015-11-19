@@ -1,0 +1,46 @@
+<MyFirstRule>
+		<in>
+			<subj>space</subj>
+			<obj>id</obj>
+			<type>ETP(id)</type>
+			<process>
+				<ParP>
+					<process>
+						<in>
+						<subj>doc</subj>
+						<obj>sum</obj>
+						<type>ETP(sum)</type>
+						<process>
+							<out>
+							<subj>doc</subj>
+							<obj>sum</obj>
+							<type>ETP(sum)</type>
+							<process>
+							<Nil>0</Nil>
+							</process>
+							</out>
+						</process>			
+						</in>
+					</process>
+					<process>
+						<out>
+							<subj>folder</subj>
+							<obj>abstract</obj>
+							<type>ETP(abstract)</type>
+							<process>
+								<in>
+									<subj>dropbox</subj>
+									<obj>file</obj>
+									<type>ETP(file)</type>
+									<process>
+									<Nil>0</Nil>
+									</process>		
+								</in>
+							</process>
+						</out>
+					</process>
+				</ParP>
+
+			</process>
+		</in>
+</MyFirstRule>
