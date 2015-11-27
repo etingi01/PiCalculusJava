@@ -1,6 +1,11 @@
 package Parser;
+import javax.swing.JTree;
+import javax.swing.tree.TreeNode;
+
 import org.w3c.dom.*;
 import org.xml.sax.SAXException;
+
+import Parser.Tree.nod;
 
 import javax.xml.parsers.*;
 import java.io.*;
@@ -23,8 +28,7 @@ public class myDomParser {
 		return s;
 	}
 	
-	public String decideSymbol(Node node, String printed, int n){
-		
+	public String decideSymbol(Node node, int n){
 		String sy = "";
 		String nodeName = node.getNodeName();
 		switch (nodeName){
@@ -37,8 +41,10 @@ public class myDomParser {
 		case "out": sy="out " ;
 		break;
 		case "subj": sy=node.getTextContent() + "(";
+	//	System.out.println("Subj: "+  sy);
 		break;
 		case "obj":sy=node.getTextContent() +" : ";
+	//	System.out.println("obj: "+  sy);
 		break;
 		case "type": sy= node.getTextContent()+ ") ";
 		break;
@@ -59,13 +65,21 @@ public class myDomParser {
 		break;
 		}
 		if (n==33){
-			if(node.getParentNode().getNodeName().equals("ParP")){
-				sy = sy + " | ";
-			}
-			if(node.getParentNode().getNodeName().equals("sumP")){
-				sy = sy + " + ";
-			}
-			
+			if(node.getParentNode().getNodeName().equals("process")){
+				Node father = node.getParentNode();
+				if (father.getParentNode().getNodeName().equals("ParP")){
+				//	System.out.println("Irthe Edw");
+					if(father.isEqualNode(father.getParentNode().getFirstChild())){
+						sy=sy+" | ";
+					}
+				}
+				if (father.getParentNode().getNodeName().equals("sumP")){
+					if(father.isEqualNode(father.getParentNode().getFirstChild())){
+						sy=sy+" + ";
+					}
+				}
+				
+			}			
 		}
 		//System.out.println("Eimaste sto" + node.getNodeName());
 		NodeList nodeChildren = node.getChildNodes();
@@ -88,6 +102,8 @@ public class myDomParser {
 			//System.out.println(prinText.getNodeName());
 			if (prinText.isEqualNode(node)){
 				//System.out.println("mpike edw");
+				String p="";
+				String a="";
 			while ((!ancestor.isEqualNode(rootNode))){
 				if (ancestor.isEqualNode(rootNode))
 					break;
@@ -95,17 +111,38 @@ public class myDomParser {
 					sy = sy + " ) ";
 				}
 				if (ancestor.getNodeName().equals("sumP")){
-					sy = sy + " ) ";
+					sy = sy + " ) " ;
 				}
 				if (ancestor.getNodeName().equals("ParP")){
-					sy = sy + " ) ";					
+					sy = sy + " ) " ;					
 				}
+				
+				p="";
 				Node ancestor2 = ancestor.getParentNode();
 				lastAnc = ancestor2.getLastChild();
 				prinText = lastAnc.getPreviousSibling();
-				if (!(prinText.isEqualNode(ancestor)))
-					break;
 				
+				/*if (!(prinText.isEqualNode(ancestor))){
+					break;
+				}*/
+				if (ancestor.isEqualNode(ancestor2.getFirstChild().getNextSibling())){
+					if (ancestor2.getNodeName().equals("ParP")){
+					sy=sy+"| ";
+					break;
+					}
+					else
+						if (ancestor2.getNodeName().equals("sumP")){
+							sy=sy + "+ ";
+							break;
+
+						}
+				}else{
+					p=a="";
+					if (!(prinText.isEqualNode(ancestor))){
+						break;
+					}
+						
+					}
 				ancestor = ancestor.getParentNode();
 				
 			}
@@ -113,39 +150,31 @@ public class myDomParser {
 			}
 		
 		}		
-		printed = printed + sy;
-
-		NodeList nList = node.getChildNodes();  
-        for (int temp = 0; temp < nList.getLength(); temp++) {
-        	//System.out.println(nList.item(temp).getNodeName());
-        	if (!(nList.item(temp).getNodeName().equals("#text"))){
-        		if ((temp<nList.getLength()-2)){
-        			n=33;
-        		}else{
-        			n=2;
-        		}
-        		decideSymbol(nList.item(temp), printed, n );
-        	}    	
-        }
-		return nodeName;
+		return sy;
         
         
 	}
-
+String all="";
 	public void printPi(Node nNode, String spaces, int n){
 		//System.out.println(spaces + nNode.getNodeName());
 		//System.out.println(nNode.getNodeName() + spaces);
 		String part="";
 		if (n>1){
-		part = decideSymbol(nNode, "", n);
+		part = decideSymbol(nNode,n);
 		}
 		spaces= spaces + part;
-		System.out.println(spaces);
+		all = all + part;
+		//System.out.print(part);
 		NodeList nList = nNode.getChildNodes();  
         for (int temp = 0; temp < nList.getLength(); temp++) {
         	//System.out.println(nList.item(temp).getNodeName());
         	if (!(nList.item(temp).getNodeName().equals("#text"))){
-        		printPi(nList.item(temp), spaces, ++n);
+        		if ((temp==nList.getLength()-2)){
+        			n=33;
+        		}else{
+        			n=2;
+        		}
+        		printPi(nList.item(temp), spaces, n);
         	}    	
         }
 	}	
@@ -172,11 +201,49 @@ public class myDomParser {
     rootNode = doc.getDocumentElement();
 	}
 
+	public static void convertion(Node node){
+		Tree myTree;
+		nod riza =new nod<String>();
+		riza.data="Process";
+
+		if (node.getNodeName().equals("Parp")){
+			
+			NodeList nlist = node.getChildNodes();
+			int num=0;
+			for (int i=0; i<nlist.getLength(); i++){
+				if (nlist.item(i).getNodeName().equals("process")){
+					num++;
+				}
+			}
+			for (int i=0; i<=num; i++){
+				riza.children.add("Summation" + i);
+			}
+		}
+		
+		if (node.getNodeName().equals("in")|node.getNodeName().equals("out")){
+			riza.data="Process";
+			riza.children.add("Summation 1");
+			nod paidi = (nod) riza.children.get(0);
+			paidi.children.add("ActionSequence");
+			nod paidi2 = (nod) paidi.children.get(0);
+			paidi2.children.add("in");
+			
+			
+		}
+		
+		
+	}
+	
+	
+	
 	public static void main(String[] args) throws SAXException, IOException, ParserConfigurationException {
 		// TODO Auto-generated method stub
 		myDomParser myParser = new myDomParser("FilesForXMLPrograms/newFile.xml");
-    	myParser.printXML(myParser.rootNode, "");    
-    	System.out.println(myParser.decideSymbol(myParser.rootNode.getFirstChild().getNextSibling(), "", 1));
+    	myParser.printPi(myParser.rootNode,"", 1);   
+    	myParser.printXML(myParser.rootNode,"");   
+
+    	System.out.println(myParser.all);
+    	//System.out.println(myParser.decideSymbol(myParser.rootNode.getFirstChild().getNextSibling(), "", 1));
 	}
 
 }
