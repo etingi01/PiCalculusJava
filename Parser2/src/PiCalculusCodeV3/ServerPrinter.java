@@ -1,4 +1,4 @@
-package PiCalculusCode;
+package PiCalculusCodeV3;
 
 import java.util.HashMap;
 
@@ -23,8 +23,8 @@ public class ServerPrinter {
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		boolean flagB=true;
-	    HashMap<Boolean, Object> mapFA = new HashMap<Boolean, Object>();
-	    HashMap<Boolean, Object> mapFB = new HashMap<Boolean, Object>();
+	    transferred mapFA = new transferred(null, false);
+	    transferred mapFB = new transferred(null, flagB);
 		ServerPrinter program = new ServerPrinter();
 	    Thread server = new serverSide(mapFB, mapFA, program.a);
 	    Thread printer = new printerSide(mapFB, mapFA);
