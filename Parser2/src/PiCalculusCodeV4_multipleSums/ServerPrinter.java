@@ -2,6 +2,7 @@ package PiCalculusCodeV4_multipleSums;
 
 import java.util.HashMap;
 
+
 public class ServerPrinter {
 	public Alink a ;
 	public Blink b;
@@ -35,7 +36,7 @@ public class ServerPrinter {
 	    server.start();
 	    printer.start();
 	    summation3.start();
-	    summation4.start();
+	    summation4.start();		
 		
 		
 	}
