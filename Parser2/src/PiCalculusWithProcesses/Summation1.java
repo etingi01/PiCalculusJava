@@ -1,18 +1,27 @@
 package PiCalculusWithProcesses;
 import org.jcsp.lang.*;
+
+
+import java.util.Timer;
+import java.util.TimerTask;
 public class Summation1 implements CSProcess  {
-	ChannelInput b;
-	ChannelOutput k;
-	
-	public Summation1(ChannelInput bCentric, ChannelOutput kCentric){
+
+	ChannelValue b = new ChannelValue();
+	ChannelValue a = new ChannelValue();
+	Integer p;
+	public Summation1(ChannelValue aCentric, ChannelValue bCentric){
 		this.b = bCentric;
-		this.k=kCentric;
+		this.a=aCentric;
+		this.a.aValue=(Integer)15;
 	}
 	public void run(){
-	   Integer d = (Integer)b.read();
-		System.out.println("Summation 1: Read from channel b: " + d);
-		k.write(new Integer(5));	
-		System.out.println("I wrote in the k channel. Summation 2 must consume");
+		this.b.aValue=a;
+		this.b.channel.out().write(this.b.aValue);
+		
+		//this.b.out().write(a);
+		System.out.println("Summation 1: Wrote to channel b: " + "Channel a");
+		p=(Integer) this.a.channel.in().read();
+		System.out.println("Summation 1: Read from channel a: " + p);
 	}
 	
 	

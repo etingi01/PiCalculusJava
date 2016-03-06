@@ -15,7 +15,7 @@ public class FinalOutput implements CSProcess  {
 	public void run() {
 		k.read();
 		k.read();
-			
+
 	}
 	
 
