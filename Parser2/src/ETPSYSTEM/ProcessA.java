@@ -17,6 +17,7 @@ public class ProcessA implements CSProcess  {
 		CSProcess[] Asums = new CSProcess[]{sum1, sum2};
 		Parallel par = new Parallel(Asums);
 		par.run();
+		par.addProcess(sum1);
 	}
 	
 }

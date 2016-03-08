@@ -15,14 +15,23 @@ public class Summation1 implements CSProcess  {
 		this.a.aValue=(Integer)15;
 	}
 	public void run(){
+		
+		while(true){
 		this.b.aValue=a;
 		this.b.channel.out().write(this.b.aValue);
-		
-		//this.b.out().write(a);
+		manager m = new manager(a);
+		ProcessManager managerP = new ProcessManager(m);
 		System.out.println("Summation 1: Wrote to channel b: " + "Channel a");
-		p=(Integer) this.a.channel.in().read();
-		System.out.println("Summation 1: Read from channel a: " + p);
+	    managerP.start ();
+
+		}
+	/*	p=(Integer) this.a.channel.in().read();
+		System.out.println("Summation 1: Read from channel a: " + p);*/
+		//}
+		//this.b.out().write(a);
 	}
-	
+	public void repeatedSequence(){
+
+	}
 	
 }
