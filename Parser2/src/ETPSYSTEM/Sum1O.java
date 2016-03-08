@@ -20,7 +20,7 @@ public class Sum1O implements CSProcess  {
 	@Override
 	public void run() {
 		// TODO Auto-generated method stub
-		//while (true){
+		while (true){
 			loc = (ChannelValue)read.channel.in().read();
 			System.out.println("processO - sum1: Received loc through read");
 			repl1O rep = new repl1O(this.spotcheck, this.topa, this.read, this.loc);
@@ -28,7 +28,7 @@ public class Sum1O implements CSProcess  {
 			manager.start();
 			/*topa.channel.out().write(loc);
 			System.out.println("processO - sum1: Sent loc through topa channel");*/
-		//}
+		}
 	}
 
 	public class repl1O implements CSProcess{

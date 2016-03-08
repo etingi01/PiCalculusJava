@@ -23,7 +23,7 @@ public class Sum2O implements CSProcess  {
 	@Override
 	public void run() {
 		// TODO Auto-generated method stub
-		//while(true){
+		while(true){
 			this.s=(ChannelValue)this.spotcheck.channel.in().read();
 			System.out.println("ProcessO - sum2: Received s through spotcheck");
 			repl2O rep = new repl2O(this.spotcheck, this.topa, this.read, this.s, this.ls);
@@ -33,7 +33,7 @@ public class Sum2O implements CSProcess  {
 			System.out.println("ProcessO - sum2: Received ls through read channel");
 			this.s.channel.out().write(ls);
 			System.out.println("ProcessO - sum2: Sent ls through s channel");*/
-		//}
+		}
 	}
 	
 	public class repl2O implements CSProcess{

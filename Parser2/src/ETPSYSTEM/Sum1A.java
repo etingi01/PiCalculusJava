@@ -20,7 +20,7 @@ public class Sum1A implements CSProcess  {
 	@Override
 	public void run() {
 		// TODO Auto-generated method stub
-	//	while(true){
+		while(true){
 			this.z=(ChannelValue) this.topa.channel.in().read();
 			System.out.println("process A - sum1: Received z channel through topa");
 			repl1A repl = new repl1A(this.spotcheck, this.topa, this.z, this.l);
@@ -28,7 +28,7 @@ public class Sum1A implements CSProcess  {
 			manager.start();
 			/*this.l=(Loc)this.z.channel.in().read();
 			System.out.println("process A - sum1: Received l Loc through z channel");*/
-	//	}
+		}
 	}
 	
 	

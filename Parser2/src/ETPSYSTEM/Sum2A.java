@@ -21,7 +21,7 @@ public class Sum2A implements CSProcess  {
 	@Override
 	public void run() {
 		// TODO Auto-generated method stub
-	//	while (true){
+		while (true){
 			ChannelValue x=new ChannelValue();
 			x.type="Tx";
 			this.spotcheck.channel.out().write(x);
@@ -34,7 +34,7 @@ public class Sum2A implements CSProcess  {
 			ls=(Loc)y.channel.in().read();
 			System.out.println("process A - sum2: Received ls Loc base type through y channel");*/
 
-		//}
+		}
 	}
 	public class repl2A implements CSProcess{
 		ChannelValue spotcheck;
