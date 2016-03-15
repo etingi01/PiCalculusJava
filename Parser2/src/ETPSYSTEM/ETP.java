@@ -6,7 +6,6 @@ public class ETP {
 	public String nameSystem = "ETP"; 
 	public ChannelValue spotcheck;
 	public ChannelValue topa;
-
 	public ETP(){
 		spotcheck = new ChannelValue();
 		topa=new ChannelValue();
