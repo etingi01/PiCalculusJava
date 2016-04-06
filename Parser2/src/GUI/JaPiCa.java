@@ -36,8 +36,6 @@ public class JaPiCa {
 	private JFrame frmJapicaPi;
 	private JFrame nextScreen;
 
-	private JTextField textField;
-
 	/**
 	 * Launch the application.
 	 */
@@ -75,37 +73,36 @@ public class JaPiCa {
 		frmJapicaPi.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frmJapicaPi.getContentPane().setLayout(null);
 		
-		textField = new JTextField();
-		textField.setHorizontalAlignment(SwingConstants.CENTER);
-		textField.setLocation(new Point(173, 121));
-		textField.setPreferredSize(new Dimension(20, 10));
-		textField.setSize(new Dimension(105, 24));
-		textField.setMinimumSize(new Dimension(20, 10));
-		textField.setMaximumSize(new Dimension(20, 10));
-		frmJapicaPi.getContentPane().add(textField);
-		textField.setColumns(10);
-		
 		JLabel lblNewJgoodiesTitle = DefaultComponentFactory.getInstance().createTitle("Base Types of the System");
 		lblNewJgoodiesTitle.setForeground(new Color(0, 0, 0));
 		lblNewJgoodiesTitle.setFont(new Font("Dialog", Font.BOLD, 16));
 		lblNewJgoodiesTitle.setBounds(10, 0, 231, 29);
 		frmJapicaPi.getContentPane().add(lblNewJgoodiesTitle);
 		
-		JLabel lblNumberOfDifferent = DefaultComponentFactory.getInstance().createLabel("Number of different base types:");
-		lblNumberOfDifferent.setFont(new Font("Dialog", Font.PLAIN, 13));
-		lblNumberOfDifferent.setBounds(138, 87, 186, 23);
-		frmJapicaPi.getContentPane().add(lblNumberOfDifferent);
-		
-		Button button = new Button("Next>");
-		button.setBackground(new Color(204, 204, 204));
+		Button button = new Button("Insert Base Type");
+		button.setForeground(new Color(255, 255, 255));
+		button.setFont(new Font("Dialog", Font.BOLD, 12));
+		button.setActionCommand("");
+		button.setBackground(new Color(51, 102, 255));
 		button.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				//frmJapicaPi.getContentPane().remove(textField);
 				init2();
 			}
 		});
-		button.setBounds(324, 193, 70, 22);
+		button.setBounds(154, 50, 140, 54);
 		frmJapicaPi.getContentPane().add(button);
+		
+		Button button_1 = new Button("FINISH");
+		button_1.setForeground(new Color(255, 255, 255));
+		button_1.setFont(new Font("Dialog", Font.PLAIN, 12));
+		button_1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+			}
+		});
+		button_1.setBackground(new Color(255, 102, 102));
+		button_1.setBounds(119, 168, 207, 29);
+		frmJapicaPi.getContentPane().add(button_1);
 	}
 	public void init2(){
 		

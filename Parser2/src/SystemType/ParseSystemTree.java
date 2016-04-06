@@ -34,6 +34,7 @@ public class ParseSystemTree {
 		String sy = "";
 		String nodeName = node.getNodeName();
 		switch (nodeName){
+		//prepei na diorthwsw ti diatipwsi oson afora to process-ParP
 		case "process": sy=node.getTextContent();
 		break;
 		case "resGP": sy="(new ";
@@ -411,7 +412,7 @@ String all="";
 	
 	public static void main(String[] args) throws SAXException, IOException, ParserConfigurationException {
 		// TODO Auto-generated method stub
-		ParseSystemTree myParser = new ParseSystemTree("FilesForXMLPrograms/SystemETP.xml");
+		ParseSystemTree myParser = new ParseSystemTree("FilesForXMLPrograms/test3resGSParSresNS.xml");
     	myParser.printXML(myParser.rootNode,"");   
 		myParser.printPi(myParser.rootNode,"", 1);   
     	System.out.print(myParser.all);

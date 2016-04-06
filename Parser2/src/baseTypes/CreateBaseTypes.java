@@ -4,6 +4,8 @@ import javax.swing.event.TableModelEvent;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableModel;
 
+import com.jgoodies.forms.factories.DefaultComponentFactory;
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -332,16 +334,34 @@ public class CreateBaseTypes {
 	
 	
 	public static void AddBaseObject(){
-		JFrame fbase = new JFrame ("Add Base Object");
-	    JButton objAdd = new JButton("Προσθήκη Αντικειμένου");
-	    JButton term = new JButton("Ολοκλήρωση");
-	    fbase.setLayout( new FlowLayout() );      // set the layout manager
+		JFrame fbase = new JFrame();
+		fbase.getContentPane().setBackground(new Color(135, 206, 250));
+	    fbase.getContentPane().setLayout(null);     // set the layout manager
    	    fbase.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		
+   	    JLabel lblNewJgoodiesTitle = DefaultComponentFactory.getInstance().createTitle("Base Types of the System");
+		lblNewJgoodiesTitle.setForeground(new Color(0, 0, 0));
+		lblNewJgoodiesTitle.setFont(new Font("Dialog", Font.BOLD, 16));
+		lblNewJgoodiesTitle.setBounds(10, 0, 231, 29);
+		fbase.getContentPane().add(lblNewJgoodiesTitle);
+		 //JButton objAdd = new JButton("Προσθήκη Αντικειμένου");
+		Button objAdd = new Button("Insert Base Type");
+		objAdd.setForeground(new Color(255, 255, 255));
+		objAdd.setFont(new Font("Dialog", Font.BOLD, 12));
+		objAdd.setActionCommand("");
+		objAdd.setBackground(new Color(51, 102, 255));
+		objAdd.setBounds(154, 50, 140, 54);
+
+		Button term = new Button("FINISH");
+		term.setForeground(new Color(255, 255, 255));
+		term.setFont(new Font("Dialog", Font.PLAIN, 12));
+		term.setBackground(new Color(255, 102, 102));
+		term.setBounds(119, 168, 207, 29);
 
 	    fbase.getContentPane().add(objAdd);
 	    fbase.getContentPane().add(term);
+	    //
 	    fbase.pack();
-	    fbase.setSize( 500, 250);     
 	    fbase.setVisible( true ); 
 
 	    objAdd.addActionListener(new ActionListener() {
