@@ -1,6 +1,7 @@
 package ETPSYSTEM;
 
 import org.jcsp.lang.CSProcess;
+import org.jcsp.lang.*;
 
 public class Sum1L implements CSProcess  {
 	public ChannelValue spotcheck;
@@ -18,8 +19,8 @@ public class Sum1L implements CSProcess  {
 	public void run() {
 		// TODO Auto-generated method stub
 		this.read.channel.out().write(newl);
-		System.out.println("Process L send newl channel of type " + newl.type);
-
+		System.out.println("Process L - sum1l: send newl channel of type " + newl.type);
+		
 	}
 
 }

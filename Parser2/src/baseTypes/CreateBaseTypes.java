@@ -22,8 +22,8 @@ import java.rmi.RemoteException;
 import java.util.ArrayList;
 public class CreateBaseTypes {
 	
-	private static ArrayList<CharacteristicsObj> BaseObj;
-	private static int numOfObjects;
+	public static ArrayList<CharacteristicsObj> BaseObj;
+	public static int numOfObjects;
 	public CreateBaseTypes(){
 		BaseObj=new ArrayList();
 		numOfObjects=0;
@@ -399,6 +399,8 @@ public class CreateBaseTypes {
 		CreateBaseTypes dimiourgia = new CreateBaseTypes();
 		
 		dimiourgia.AddBaseObject();
+		
+	
 	}
 
 }

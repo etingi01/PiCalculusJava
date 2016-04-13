@@ -4,12 +4,14 @@ import javax.swing.tree.TreeNode;
 
 import org.jcsp.lang.CSProcess;
 import org.jcsp.lang.Parallel;
+import org.jcsp.lang.ProcessManager;
 import org.w3c.dom.*;
 import org.xml.sax.SAXException;
 
 import ETPSYSTEM.ChannelValue;
 import ETPSYSTEM.atomicGroup;
 import Parser.Tree.nod;
+import baseTypes.CreateBaseTypes;
 
 import javax.xml.parsers.*;
 import java.io.*;
@@ -33,6 +35,7 @@ public class ConvertSystem {
 	private Node ParPNode;
 	//private static int processNewGP = 0;
 	private static int ParPproc = 0;
+	private static int ReplP=0;
 	private static ArrayList<String> baseTypes = new ArrayList<String>();
 	private static HashMap<String, String> globalChannels = new HashMap<String, String>();
 	public ConvertSystem(String file) throws ParserConfigurationException, SAXException, IOException {
@@ -80,7 +83,8 @@ public class ConvertSystem {
 			}
 		}
 		for(int l=0; l<prNames.size(); l++){
-			writer.print("\t\t\t Process" + prNames.get(l) + " " + prNames.get(l) + " = new Process" + prNames.get(l) + "(");
+			String varp = prNames.get(l)+"GrPr";
+			writer.print("\t\t\t Process" + prNames.get(l) + " " + varp  + " = new Process" + prNames.get(l) + "(");
 		    Iterator it = resNS.entrySet().iterator();
 		    while (it.hasNext()) {
 		        Map.Entry pair = (Map.Entry)it.next();
@@ -104,7 +108,7 @@ public class ConvertSystem {
 		//CSProcess[] PAprocesses = new CSProcess[]{A};
 		writer.print("\t\t\t CSProcess[] " + groupName + "processes = new CSProcess[]{");
 		for(int l=0; l<prNames.size(); l++){
-			writer.print(prNames.get(l));
+			writer.print(prNames.get(l)+"GrPr");
 			if(l!=prNames.size()-1){
 				writer.print(", ");
 			}
@@ -132,7 +136,7 @@ public class ConvertSystem {
 		writer.println("import java.io.*;");
 		writer.println("import java.util.ArrayList;");
 		writer.println("import java.util.HashMap;");
-		writer.println("public class " + namePro + " {");
+		writer.println("public class " + namePro + " implements CSProcess {");
 		writer.println("\t public String nameProcess = \"" + namePro +"\";" );
 	    Iterator it = resNS.entrySet().iterator();
 	    while (it.hasNext()) {
@@ -189,6 +193,14 @@ public class ConvertSystem {
 	    }
 	    if(nextPro.getNodeName().equals("resNP")){
 	    	handleResNP(nextPro, writer);
+	    	Node nextProc = null;
+	    	NodeList resCh = nextPro.getChildNodes();
+	    	for(int yy=0; yy<resCh.getLength(); yy++){
+	    		if(resCh.item(yy).getNodeName().equals("process")){
+	    			nextProc = resCh.item(yy).getFirstChild().getNextSibling();
+	    		}
+	    	}
+	    	goToNext(nextProc, writer);
 	    }
 	    if(nextPro.getNodeName().equals("repl")){
 	    	handleRepl(nextPro, writer);
@@ -202,6 +214,10 @@ public class ConvertSystem {
 		writer.println("}");
 		writer.close();
 	}
+	public static void createReplClass(Node node, String replName){
+		
+	}
+	
 	public static void createProcessPar(Node node, String proName) throws IOException{
 		HashMap<String, String> resNS = new HashMap<String, String>();
 		Node ancestorGS = node.getParentNode();		
@@ -237,7 +253,7 @@ public class ConvertSystem {
 		writer.println("import java.io.*;");
 		writer.println("import java.util.ArrayList;");
 		writer.println("import java.util.HashMap;");
-		writer.println("public class " + proName + " {");
+		writer.println("public class " + proName + " implements CSProcess {");
 		writer.println("\t public String nameProcess = \"" + proName +"\";" );
 	    Iterator it = resNS.entrySet().iterator();
 	    while (it.hasNext()) {
@@ -294,6 +310,14 @@ public class ConvertSystem {
 	    }
 	    if(nextPro.getNodeName().equals("resNP")){
 	    	handleResNP(nextPro, writer);
+	    	Node nextProc = null;
+	    	NodeList resCh = nextPro.getChildNodes();
+	    	for(int yy=0; yy<resCh.getLength(); yy++){
+	    		if(resCh.item(yy).getNodeName().equals("process")){
+	    			nextProc = resCh.item(yy).getFirstChild().getNextSibling();
+	    		}
+	    	}
+	    	goToNext(nextProc, writer);
 	    }
 	    if(nextPro.getNodeName().equals("repl")){
 	    	handleRepl(nextPro, writer);
@@ -389,7 +413,177 @@ public class ConvertSystem {
 		writer.println("\t\t\t par.run();");
 		
 	}
-	public static void handleIn(Node in, PrintWriter writer) throws IOException{
+	public static void createParRepl(Node repl, Node node, String proName) throws IOException{
+		HashMap<String, String> resNS = new HashMap<String, String>();
+		Node ancestorGS = repl.getParentNode();		
+		while(ancestorGS!=null){
+			if((ancestorGS.getNodeName().equals("resNS"))||(ancestorGS.getNodeName().equals("resNP"))){
+				HashMap <String, String> ResNSpart =  new HashMap<String, String>();
+				ResNSpart = handleresNS(ResNSpart,ancestorGS); //mporei na exei lathos
+				resNS.putAll(ResNSpart);
+			}
+			if(ancestorGS.getNodeName().equals("in")){
+				NodeList childrenIn = ancestorGS.getChildNodes();
+				Node inplace = null;
+				Node type = null;
+				for(int v=0; v<childrenIn.getLength(); v++){
+					if(childrenIn.item(v).getNodeName().equals("obj")){
+						inplace=childrenIn.item(v);
+					}
+					if(childrenIn.item(v).getNodeName().equals("type")){
+						type=childrenIn.item(v);
+					}
+				}
+				resNS.put(inplace.getTextContent(), type.getTextContent());
+			}	
+
+			ancestorGS = ancestorGS.getParentNode();
+		}
+
+		String fileName = proName + ".java";
+		@SuppressWarnings("resource")
+		PrintWriter writer = new PrintWriter(fileName, "UTF-8");
+		new File(fileName).createNewFile();		
+		writer.println("import org.jcsp.lang.*;");
+		writer.println("import java.io.*;");
+		writer.println("import java.util.ArrayList;");
+		writer.println("import java.util.HashMap;");
+		writer.println("public class " + proName + " implements CSProcess {");
+		writer.println("\t public String nameProcess = \"" + proName +"\";" );
+	    Iterator it = resNS.entrySet().iterator();
+	    while (it.hasNext()) {
+	        Map.Entry pair = (Map.Entry)it.next();
+			writer.println("\t public ChannelValue " + pair.getKey() + " ;");
+	    }
+	    Iterator it10 = globalChannels.entrySet().iterator();
+	    while (it10.hasNext()) {
+	        Map.Entry pair = (Map.Entry)it10.next();
+			writer.println("\t public ChannelValue " + pair.getKey() + " ;");
+	    }
+
+	    writer.print("\t public " + proName + "(" );
+	    Iterator it3 = resNS.entrySet().iterator();
+	    while (it3.hasNext()) {
+	        Map.Entry pair = (Map.Entry)it3.next();
+			writer.print(" ChannelValue " + pair.getKey());
+			if(it3.hasNext()||!globalChannels.isEmpty()){
+				writer.print(",");
+			}
+	    }
+	    Iterator it7 = globalChannels.entrySet().iterator();
+	    while (it7.hasNext()) {
+	        Map.Entry pair = (Map.Entry)it3.next();
+			writer.print(" ChannelValue " + pair.getKey());
+			if(it7.hasNext()){
+				writer.print(",");
+			}
+	    }
+
+	    writer.println("){");
+	    Iterator it5 = resNS.entrySet().iterator();
+	    while (it5.hasNext()) {
+	        Map.Entry pair = (Map.Entry)it5.next();
+			writer.println("\t\t\t this." + pair.getKey() + " = " + pair.getKey() + ";");
+	    }
+	    Iterator it15 = globalChannels.entrySet().iterator();
+	    while (it15.hasNext()) {
+	        Map.Entry pair = (Map.Entry)it15.next();
+			writer.println("\t\t\t this." + pair.getKey() + " = " + pair.getKey() + ";");
+	    }
+
+		writer.println("\t }");
+	    writer.println("\t public void run() {");
+	    writer.println("\t\t while (true) {");
+	    handleResNP(repl, writer);
+	    //ReplInParSResNP
+	    //simplirwma
+	    writer.println("\t\t }");
+		writer.println("\t }");
+		writer.println("}");
+		
+		writer.close();
+
+	}
+	public static void handleParResRepl(Node repl, Node parP, PrintWriter writer) throws IOException{
+		NodeList children = parP.getChildNodes();
+		ArrayList<Node> processes = new ArrayList<Node>();
+		for(int i=0; i<children.getLength(); i++){
+			if(processes.get(i).getNodeName().equals("process")){
+				processes.add(processes.get(i));
+			}
+		}
+		HashMap<String, String> resNS = new HashMap<String, String>();
+		Node ancestorGS = repl.getParentNode();		
+		while(ancestorGS!=null){
+			if((ancestorGS.getNodeName().equals("resNS"))||(ancestorGS.getNodeName().equals("resNP"))){
+				HashMap <String, String> ResNSpart =  new HashMap<String, String>();
+				ResNSpart = handleresNS(ResNSpart,ancestorGS); //mporei na exei lathos
+				resNS.putAll(ResNSpart);
+			}	
+			if(ancestorGS.getNodeName().equals("in")){
+				NodeList childrenIn = ancestorGS.getChildNodes();
+				Node inplace = null;
+				Node type = null;
+				for(int v=0; v<childrenIn.getLength(); v++){
+					if(childrenIn.item(v).getNodeName().equals("obj")){
+						inplace=childrenIn.item(v);
+					}
+					if(childrenIn.item(v).getNodeName().equals("type")){
+						type=childrenIn.item(v);
+					}
+				}
+				resNS.put(inplace.getTextContent(), type.getTextContent());
+			}	
+			ancestorGS = ancestorGS.getParentNode();
+		}
+		
+
+		ArrayList<String> parallelItems = new ArrayList<String>();
+		for(int i=0; i<processes.size(); i++){
+			ParPproc++;
+			String processName = "ParallelProc" + ParPproc;
+			parallelItems.add(processName);
+			createParRepl(repl, processes.get(i), processName);
+
+		}
+		for(int k=0; k<parallelItems.size(); k++){
+			writer.print("\t\t\t " + parallelItems.get(k) + " " + "ParP"+k + " = new " + parallelItems.get(k) + "(");
+		    Iterator it = resNS.entrySet().iterator();
+		    while (it.hasNext()) {
+		        Map.Entry pair = (Map.Entry)it.next();
+				writer.print(pair.getKey());
+				if(it.hasNext()){
+					writer.print(", ");
+				}
+		    }
+		    Iterator it2 = globalChannels.entrySet().iterator();
+		    while (it2.hasNext()) {
+		        Map.Entry pair = (Map.Entry)it2.next();
+				writer.print(pair.getKey());
+				if(it2.hasNext()){
+					writer.print(", ");
+				}
+		    }
+
+		    writer.println(");");
+
+		}
+		
+		
+		
+		writer.print("\t\t\t CSProcess[] parParts = new CSProcess[]{");
+		for(int k=0; k<parallelItems.size(); k++){
+			writer.print(parallelItems.get(k));
+			if(k!=parallelItems.size()-1){
+				writer.print(",");
+			}
+		}
+		writer.println("};");
+		writer.println("\t\t\t Parallel par = new Parallel(parParts);");
+		writer.println("\t\t\t par.run();");
+
+	}
+	public static void ReplInParSResNP(Node in, PrintWriter writer) throws IOException{
 		NodeList children = in.getChildNodes();
 		String inPlace="";
 		String typeInplace = "";
@@ -473,7 +667,127 @@ public class ConvertSystem {
     		else
         		writer.println("\t\t\t "+inPlace + " = (ChannelValue) " + throughChannel+".channel.in().read();");
     	}
+
+		
+		
+	}
+	public static void ReplOutParSResNP(Node out, PrintWriter writer) throws IOException{
+		NodeList chOut = out.getChildNodes();
+		String thC="";
+		String whatC = "";
+		Node next = null;
+		for(int i=0; i<chOut.getLength(); i++){
+			//		this.read.channel.out().write(newl);
+			if(chOut.item(i).getNodeName().equals("subj")){
+				thC = chOut.item(i).getTextContent();
+			}
+			if(chOut.item(i).getNodeName().equals("obj")){
+				whatC = chOut.item(i).getTextContent();
+			}
+			writer.println(thC + ".channel.out().write( " + whatC + " );");
+			if(chOut.item(i).getNodeName().equals("process")){
+				next = chOut.item(i);
+			}
+
+		}
+		
+	}
+
+	public static void handleIn(Node in, PrintWriter writer) throws IOException{
+		NodeList children = in.getChildNodes();
+		String inPlace="";
+		String typeInplace = "";
+		String throughChannel="";
+		Node nextProcess=null;
+		for(int i=0; i<children.getLength(); i++){
+			if(children.item(i).getNodeName().equals("obj")){
+				inPlace=children.item(i).getTextContent();
+			}
+			if(children.item(i).getNodeName().equals("type")){
+				typeInplace=children.item(i).getTextContent();
+			}
+
+			if(children.item(i).getNodeName().equals("subj")){
+				throughChannel=children.item(i).getTextContent();
+			}
+			if(children.item(i).getNodeName().equals("process")){
+				nextProcess=children.item(i);
+			}
+		}
+		boolean alreadyExists = false;
+	    Iterator it2 = globalChannels.entrySet().iterator();
+	    while (it2.hasNext()) {
+	        Map.Entry<String, String> pair = (Map.Entry)it2.next();
+	        String name = (String) pair.getKey();
+	        String typeName = (String) pair.getValue();
+	        if(name.equals(inPlace)&&typeName.equals(typeInplace)){
+	        	alreadyExists=true;
+	        }
+	    }
+	    HashMap<String, String> resNS = new HashMap<String, String>();
+		Node ancestorGS = in.getParentNode();		
+		
+		while(ancestorGS!=null){
+			if((ancestorGS.getNodeName().equals("resNS"))||(ancestorGS.getNodeName().equals("resNP"))){
+				HashMap <String, String> ResNSpart =  new HashMap<String, String>();
+				ResNSpart = handleresNS(ResNSpart,ancestorGS); //mporei na exei lathos
+				resNS.putAll(ResNSpart);
+			}	
+			if(ancestorGS.getNodeName().equals("in")){
+				NodeList childrenIn = ancestorGS.getChildNodes();
+				Node inplace = null;
+				Node type = null;
+				for(int v=0; v<childrenIn.getLength(); v++){
+					if(childrenIn.item(v).getNodeName().equals("obj")){
+						inplace=childrenIn.item(v);
+					}
+					if(childrenIn.item(v).getNodeName().equals("type")){
+						type=childrenIn.item(v);
+					}
+				}
+				resNS.put(inplace.getTextContent(), type.getTextContent());
+			}	
+			ancestorGS = ancestorGS.getParentNode();
+		}
+	    Iterator it3 = resNS.entrySet().iterator();
+	    while (it3.hasNext()) {
+	        Map.Entry<String, String> pair = (Map.Entry)it3.next();
+	        String name = (String) pair.getKey();
+	        String typeName = (String) pair.getValue();
+	        if(name.equals(inPlace)&&typeName.equals(typeInplace)){
+	        	alreadyExists=true;
+	        }
+	    }
+	    if(!alreadyExists){
+	    	if(baseTypes.contains(typeInplace)){
+	    		writer.println("\t\t\t "+ typeInplace + "  "+ inPlace + " = new " + typeInplace + "();");
+	    	}else{
+	    		writer.println("\t\t\t ChannelValue " + inPlace + " = new ChannelValue();");
+	    		writer.println("\t\t\t " + inPlace + ".type = \"" + typeInplace + "\";" );
+	    	}
+	    }
+    	if(baseTypes.contains(typeInplace)){
+    		if(alreadyExists)
+    		writer.println("\t\t\t this." + inPlace + " = (" + typeInplace + ") "+throughChannel+".channel.in().read();");
+    		else
+    			writer.println("\t\t\t " + inPlace + " = (" + typeInplace + ") "+throughChannel+".channel.in().read();");   			
+    	}else{
+    		if(alreadyExists)
+        		writer.println("\t\t\t "+inPlace + " = (ChannelValue) " + throughChannel+".channel.in().read();");
+    		else
+        		writer.println("\t\t\t "+inPlace + " = (ChannelValue) " + throughChannel+".channel.in().read();");
+    	}
 		Node nextPro = nextProcess.getFirstChild().getNextSibling();
+		
+		if(!(in.getParentNode().getParentNode().equals("repl"))){
+			System.out.println("In paidi tou repl");
+			goToNext(nextPro, writer);
+
+		}
+	}
+		
+		
+		public static void goToNext(Node nextPro, PrintWriter writer) throws IOException{
 		if(nextPro.getNodeName().equals("parP")){
 	    	handleParP(nextPro, writer);
 	    }
@@ -485,6 +799,14 @@ public class ConvertSystem {
 	    }
 	    if(nextPro.getNodeName().equals("resNP")){
 	    	handleResNP(nextPro, writer);
+	    	Node nextProc = null;
+	    	NodeList resCh = nextPro.getChildNodes();
+	    	for(int yy=0; yy<resCh.getLength(); yy++){
+	    		if(resCh.item(yy).getNodeName().equals("process")){
+	    			nextProc = resCh.item(yy).getFirstChild().getNextSibling();
+	    		}
+	    	}
+	    	goToNext(nextProc, writer);
 	    }
 	    if(nextPro.getNodeName().equals("repl")){
 	    	handleRepl(nextPro, writer);
@@ -508,32 +830,22 @@ public class ConvertSystem {
 			if(chOut.item(i).getNodeName().equals("obj")){
 				whatC = chOut.item(i).getTextContent();
 			}
+			
 			if(chOut.item(i).getNodeName().equals("process")){
 				next = chOut.item(i);
 			}
-			Node nextPro = next.getFirstChild().getNextSibling();
-			if(nextPro.getNodeName().equals("parP")){
-		    	handleParP(nextPro, writer);
-		    }
-		    if(nextPro.getNodeName().equals("in")){
-		    	handleIn(nextPro, writer);
-		    }
-		    if(nextPro.getNodeName().equals("out")){
-		    	handleOut(nextPro, writer);
-		    }
-		    if(nextPro.getNodeName().equals("resNP")){
-		    	handleResNP(nextPro, writer);
-		    }
-		    if(nextPro.getNodeName().equals("repl")){
-		    	handleRepl(nextPro, writer);
-		    }
-		    if(nextPro.getNodeName().equals("Nil")){
-		    	handleNil(nextPro, writer);
-
-		    }
-
 		}
-		writer.println(thC + ".channel.out().write(" + whatC + ");");
+		writer.println("\t\t\t "+thC + ".channel.out().write( " + whatC + " );");
+
+			Node nextPro = next.getFirstChild().getNextSibling();
+			
+			if(!(out.getParentNode().getParentNode().equals("repl"))){
+				System.out.println("In paidi tou repl");
+				goToNext(nextPro, writer);
+			}
+			
+
+		
 		
 	}
 	public static void handleResNP(Node resNP, PrintWriter writer){
@@ -563,8 +875,140 @@ public class ConvertSystem {
 
 		
 	}
-	public static void handleRepl(Node repl, PrintWriter writer){
-		
+	
+	public static void handleInRepl(HashMap<String,String> resNS,Node firstInstr, PrintWriter writer) throws IOException{
+		ReplP++;
+		writer.println("\t\t\t while(true){ ");
+		handleIn(firstInstr, writer);
+		writer.print("\t\t\t Repl" + ReplP + " rep = new ReplP" + ReplP +"(");
+		 Iterator it = resNS.entrySet().iterator();
+		    while (it.hasNext()) {
+		        Map.Entry pair = (Map.Entry)it.next();
+				writer.print(pair.getKey());
+				if(it.hasNext()){
+					writer.print(", ");
+				}
+		    }
+		    Iterator it2 = globalChannels.entrySet().iterator();
+		    while (it2.hasNext()) {
+		        Map.Entry pair = (Map.Entry)it2.next();
+				writer.print(pair.getKey());
+				if(it2.hasNext()){
+					writer.print(", ");
+				}
+		    }
+		writer.println(");");
+		writer.println("\t\t\t ProcessManager manager = new ProcessManager(rep);");
+		writer.println("\t\t\t manager.start();");
+		writer.println("\t\t\t }");
+		NodeList inChi = firstInstr.getChildNodes();
+		Node proIn= null;
+		for(int pp=0; pp<inChi.getLength(); pp++){
+			if (inChi.item(pp).getNodeName().equals("process")){
+				proIn=inChi.item(pp);
+			}
+		}
+		createProcessPar(proIn, "Repl"+ReplP);
+	}
+	public static void handleOutRepl(HashMap<String,String> resNS,Node firstInstr, PrintWriter writer) throws IOException{
+		ReplP++;
+		writer.println("\t\t\t while(true){ ");
+		handleOut(firstInstr, writer);
+		writer.print("\t\t\t Repl" + ReplP + " rep = new ReplP" + ReplP +"(");
+		 Iterator it = resNS.entrySet().iterator();
+		    while (it.hasNext()) {
+		        Map.Entry pair = (Map.Entry)it.next();
+				writer.print(pair.getKey());
+				if(it.hasNext()){
+					writer.print(", ");
+				}
+		    }
+		    Iterator it2 = globalChannels.entrySet().iterator();
+		    while (it2.hasNext()) {
+		        Map.Entry pair = (Map.Entry)it2.next();
+				writer.print(pair.getKey());
+				if(it2.hasNext()){
+					writer.print(", ");
+				}
+		    }
+		writer.println(");");
+		writer.println("\t\t\t ProcessManager manager = new ProcessManager(rep);");
+		writer.println("\t\t\t manager.start();");
+		writer.println("\t\t\t }");
+		NodeList inChi = firstInstr.getChildNodes();
+		Node proIn= null;
+		for(int pp=0; pp<inChi.getLength(); pp++){
+			if (inChi.item(pp).getNodeName().equals("process")){
+				proIn=inChi.item(pp);
+			}
+		}
+		createProcessPar(proIn, "Repl"+ReplP);
+
+	
+	}
+	public static void handleRepl(Node repl, PrintWriter writer) throws IOException{
+		Node replProc = repl.getFirstChild().getNextSibling();
+		Node firstInstr = replProc.getFirstChild().getNextSibling();
+		String fInName = firstInstr.getNodeName();
+		HashMap<String, String> resNS = new HashMap<String, String>();
+		Node ancestorGS = repl.getParentNode();		
+		while(ancestorGS!=null){
+			if((ancestorGS.getNodeName().equals("resNS"))||(ancestorGS.getNodeName().equals("resNP"))){
+				HashMap <String, String> ResNSpart =  new HashMap<String, String>();
+				ResNSpart = handleresNS(ResNSpart,ancestorGS); //mporei na exei lathos
+				resNS.putAll(ResNSpart);
+			}	
+			if(ancestorGS.getNodeName().equals("in")){
+				NodeList childrenIn = ancestorGS.getChildNodes();
+				Node inplace = null;
+				Node type = null;
+				for(int v=0; v<childrenIn.getLength(); v++){
+					if(childrenIn.item(v).getNodeName().equals("obj")){
+						inplace=childrenIn.item(v);
+					}
+					if(childrenIn.item(v).getNodeName().equals("type")){
+						type=childrenIn.item(v);
+					}
+				}
+				resNS.put(inplace.getTextContent(), type.getTextContent());
+			}	
+			ancestorGS = ancestorGS.getParentNode();
+		}
+
+		if(fInName.equals("resNP")){
+			NodeList children = firstInstr.getChildNodes();
+			Node nextProcess=null;
+			for(int j=0; j<children.getLength(); j++){
+				if(children.item(j).getNodeName().equals("process")){
+					nextProcess=children.item(j);
+				}
+			}
+			Node Pro = nextProcess.getFirstChild().getNextSibling();
+			if(Pro.getNodeName().equals("in")){
+				handleResNP(firstInstr, writer);
+				handleInRepl(resNS, firstInstr, writer);
+
+			}
+			if(Pro.getNodeName().equals("out")){
+				handleResNP(firstInstr, writer);
+				handleOutRepl(resNS, firstInstr, writer);
+
+			}
+			if(Pro.getNodeName().equals("parP")){
+				handleParResRepl(firstInstr, Pro, writer);
+				//simplirwma
+			}
+		}
+		if(fInName.equals("parP")){
+			//handleReplPar(firstInstr);
+			//simplirwma
+		}
+		if(fInName.equals("in")){
+			handleInRepl(resNS, firstInstr, writer);
+		}
+		if(fInName.equals("out")){
+			handleOutRepl(resNS, firstInstr, writer);
+		}
 	}
 	public static void handleNil(Node nil, PrintWriter writer){
 		
@@ -737,7 +1181,7 @@ public class ConvertSystem {
 		writer.println("import java.io.*;");
 		writer.println("import java.util.ArrayList;");
 		writer.println("import java.util.HashMap;");
-		writer.println("public class " + classSys + " {");
+		writer.println("public class " + classSys + " implements CSProcess {");
 		writer.println("\t public String nameSystem = \"" + classSys +"\";" );
 	    Iterator it = resNS.entrySet().iterator();
 	    while (it.hasNext()) {
@@ -788,7 +1232,7 @@ public class ConvertSystem {
 	    if(hasResGP){
 	    	//handleAtomicGroup(Node resGP, String groupName, HashMap<String, String> resNS,PrintWriter writer)
 	    	Node groupP = SGroup.item(indexResGP);
-	    	String groupName = groupP.getFirstChild().getNextSibling().getTextContent();
+	    	String groupName = groupP.getFirstChild().getNextSibling().getTextContent() ;
 	    	handleAtomicGroup(groupP, groupName, writer);
 			writer.println("\t\t\t " + groupName + ".run();");
 	    }
@@ -828,7 +1272,7 @@ public class ConvertSystem {
 		
 		if(afterRes.getNodeName().equals("resGP")){
 			internal.add(afterRes.getFirstChild().getNextSibling().getTextContent());
-			String group = afterRes.getFirstChild().getNextSibling().getTextContent();
+			String group = afterRes.getFirstChild().getNextSibling().getTextContent() ;
 			handleAtomicGroup(afterRes, group, writer );
 		//	writer.println("\t\t\t " + group + ".run();");
 
@@ -856,7 +1300,7 @@ public class ConvertSystem {
 				ch = parch.item(i).getFirstChild().getNextSibling();
 				if(ch.getNodeName().equals("resGP")){
 					groups.add(ch.getFirstChild().getNextSibling().getTextContent());
-					String group = ch.getFirstChild().getNextSibling().getTextContent();
+					String group = ch.getFirstChild().getNextSibling().getTextContent() ;
 					handleAtomicGroup(ch, group, writer );
 					//writer.println("\t\t\t " + group + ".run();");
 				}
@@ -908,6 +1352,7 @@ public class ConvertSystem {
 	}
 	
 	public static void createRootParS(Node node) throws IOException{
+		//globalChannels
 		String fileName=  "SystemBoot.java";
 		@SuppressWarnings("resource")
 		PrintWriter writer = new PrintWriter(fileName, "UTF-8");
@@ -916,7 +1361,7 @@ public class ConvertSystem {
 		writer.println("import java.io.*;");
 		writer.println("import java.util.ArrayList;");
 		writer.println("import java.util.HashMap;");
-		writer.println("public class " + "SystemBoot" + " {");
+		writer.println("public class " + "SystemBoot" + " implements CSProcess {");
 		NodeList childrenParS = node.getChildNodes();
 		ArrayList<String> parallelItems = new ArrayList<String>();
 		HashMap<String, String> resNSmap = new HashMap<String, String>();
@@ -956,7 +1401,7 @@ public class ConvertSystem {
 					//parallelItems.add(groupName);
 				}
 				if(nodeS.getNodeName().equals("resGP")){
-			    	String groupName = nodeS.getFirstChild().getNextSibling().getTextContent();
+			    	String groupName = nodeS.getFirstChild().getNextSibling().getNodeName() ;
 			    	handleAtomicGroup(nodeS, groupName, writer);
 					parallelItems.add(groupName);
 			    	//writer.println("\t\t\t " + groupName + ".run();");
@@ -985,6 +1430,7 @@ public class ConvertSystem {
 	    writer.close();
 	}
 	public static void createRoorResNS(Node node) throws IOException{
+		//globalChannels
 		String fileName=  "SystemBoot.java";
 		@SuppressWarnings("resource")
 		PrintWriter writer = new PrintWriter(fileName, "UTF-8");
@@ -993,7 +1439,7 @@ public class ConvertSystem {
 		writer.println("import java.io.*;");
 		writer.println("import java.util.ArrayList;");
 		writer.println("import java.util.HashMap;");
-		writer.println("public class " + "SystemBoot" + " {");
+		writer.println("public class " + "SystemBoot" + " implements CSProcess {");
 		HashMap<String, String> resNSmap = new HashMap<String, String>();
 		resNSmap = findAllResNS(resNSmap, node);
 		writer.println("\t public String nameSystem = \"SystemBoot\" ;" );
@@ -1042,7 +1488,7 @@ public class ConvertSystem {
 
 	    		}
 	    		if(systemType.getNodeName().equals("resGP")){
-	    			String groupName = systemType.getFirstChild().getNextSibling().getNodeName();
+	    			String groupName = systemType.getFirstChild().getNextSibling().getTextContent();
 					handleAtomicGroup(systemType, groupName, writer);
 			    	writer.println("\t\t\t " + groupName + ".run();");
 
@@ -1061,6 +1507,7 @@ public class ConvertSystem {
 
 	}
 	public static void createRootResGP(Node node) throws IOException{
+		//global Channels
 		String fileName=  "SystemBoot.java";
 		@SuppressWarnings("resource")
 		PrintWriter writer = new PrintWriter(fileName, "UTF-8");
@@ -1069,7 +1516,7 @@ public class ConvertSystem {
 		writer.println("import java.io.*;");
 		writer.println("import java.util.ArrayList;");
 		writer.println("import java.util.HashMap;");
-		writer.println("public class " + "SystemBoot" + " {");
+		writer.println("public class " + "SystemBoot" + " implements CSProcess {");
 		writer.println("\t public String nameSystem = \"SystemBoot\" ;" );
 	    writer.println("\t\t public SystemBoot " + "(){" );
 	    writer.println("\t\t}");
@@ -1109,9 +1556,89 @@ public class ConvertSystem {
         }
 
 	}
+	public boolean checkResIn(Node node, String str){
+		Node ancestor = node.getParentNode();
+		boolean nonglobal = false;
+		while(ancestor!=null){
+			if((ancestor.getNodeName().equals("resNS"))||(ancestor.getNodeName().equals("resNP"))){
+				NodeList ancch = ancestor.getChildNodes();
+				for(int b=0; b<ancch.getLength(); b++){
+					if(ancch.item(b).getNodeName().equals("name")){
+						if(ancch.item(b).getTextContent().equals(str))
+							nonglobal=true;
+					}
+				}
+				
+				
+			}
+			if(ancestor.getNodeName().equals("in")){
+				NodeList childrenIn = ancestor.getChildNodes();
+				Node inplace = null;
+				Node type = null;
+				for(int v=0; v<childrenIn.getLength(); v++){
+					if(childrenIn.item(v).getNodeName().equals("obj")){
+						if(childrenIn.item(v).getTextContent().equals(str))
+							nonglobal=true;
+					
+					}
+				}
+			}	
+
+			ancestor = ancestor.getParentNode();
+		}
+		return nonglobal;
+	}
+	public ArrayList<String> decideGlobals(Node node, ArrayList<String> global){
+		NodeList chi = node.getChildNodes();
+		
+		
+		for(int i = 0; i<chi.getLength(); i++){
+			String name = null;
+			if(chi.item(i).equals("in")){
+				NodeList vhIn = chi.item(i).getChildNodes();
+				for(int j=0; j<vhIn.getLength(); j++){
+					if (vhIn.item(j).getNodeName().equals("subj")){
+						name=vhIn.item(j).getTextContent();
+						if(!checkResIn(chi.item(i), name))
+							global.add(name);
+					}
+				}
+			}
+			if(chi.item(i).equals("out")){
+				String name2=null;
+				NodeList vhIn = chi.item(i).getChildNodes();
+				for(int j=0; j<vhIn.getLength(); j++){
+					if (vhIn.item(j).getNodeName().equals("subj")){
+						name=vhIn.item(j).getTextContent();
+						if(!checkResIn(chi.item(i), name))
+							global.add(name);
+
+					}
+					if (vhIn.item(j).getNodeName().equals("obj")){
+						name2=vhIn.item(j).getTextContent();
+						if(!checkResIn(chi.item(i), name2))
+							global.add(name2);
+
+					}
+				}
+			}
+			return global;
+		}
+		
+		return global;
+		
+	}
 	public static void main(String[] args) throws SAXException, IOException, ParserConfigurationException {
-		ConvertSystem myParser = new ConvertSystem("FilesForXMLPrograms/SystemETP.xml");
+		ConvertSystem myParser = new ConvertSystem("FilesForXMLPrograms/HouseSystem.xml");
 		boolean foundGS=false;
+		//CreateBaseTypes dimiourgia = new CreateBaseTypes();		
+		//dimiourgia.AddBaseObject();
+		//for(int b=0; b<dimiourgia.BaseObj.size(); b++){
+		//	myParser.baseTypes.add(dimiourgia.BaseObj.get(b).nameOb);
+		//}
+		//ArrayList<String> inoutch = new ArrayList<String>();
+		//inoutch.addAll(myParser.decideGlobals(myParser.rootNode, inoutch));
+		
 		myParser.decideItem(myParser.rootNode,foundGS);
 		
 

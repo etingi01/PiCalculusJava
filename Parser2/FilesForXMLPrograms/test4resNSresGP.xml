@@ -1,0 +1,16 @@
+<resNS>
+	<name>spotcheck</name>
+	<type>Tsc</type>
+	<system>
+		<resGP>
+			<group>OBE</group>
+			<process>
+				<ParP>
+					<process>O</process>
+					<process>P</process>
+					<process>E</process>
+				</ParP>
+			</process>
+		</resGP>
+	</system>
+</resNS>
