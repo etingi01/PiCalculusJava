@@ -382,7 +382,7 @@ public class ConvertSystem {
 		    while (it.hasNext()) {
 		        Map.Entry pair = (Map.Entry)it.next();
 				writer.print(pair.getKey());
-				if(it.hasNext()){
+				if(it.hasNext()||!globalChannels.isEmpty()){
 					writer.print(", ");
 				}
 		    }
@@ -552,7 +552,7 @@ public class ConvertSystem {
 		    while (it.hasNext()) {
 		        Map.Entry pair = (Map.Entry)it.next();
 				writer.print(pair.getKey());
-				if(it.hasNext()){
+				if(it.hasNext()||!globalChannels.isEmpty()){
 					writer.print(", ");
 				}
 		    }
@@ -878,8 +878,16 @@ public class ConvertSystem {
 	
 	public static void handleInRepl(HashMap<String,String> resNS,Node firstInstr, PrintWriter writer) throws IOException{
 		ReplP++;
+		Node ance = firstInstr.getParentNode().getParentNode();
+		
 		writer.println("\t\t\t while(true){ ");
+		
+		if(ance.getNodeName().equals("resNP")){
+			handleResNP(ance, writer);
+		}
 		handleIn(firstInstr, writer);
+		
+		
 		writer.print("\t\t\t Repl" + ReplP + " rep = new ReplP" + ReplP +"(");
 		 Iterator it = resNS.entrySet().iterator();
 		    while (it.hasNext()) {
@@ -912,7 +920,14 @@ public class ConvertSystem {
 	}
 	public static void handleOutRepl(HashMap<String,String> resNS,Node firstInstr, PrintWriter writer) throws IOException{
 		ReplP++;
+		Node ance = firstInstr.getParentNode().getParentNode();
+
 		writer.println("\t\t\t while(true){ ");
+		if(ance.getNodeName().equals("resNP")){
+			handleResNP(ance, writer);
+		}
+		
+
 		handleOut(firstInstr, writer);
 		writer.print("\t\t\t Repl" + ReplP + " rep = new ReplP" + ReplP +"(");
 		 Iterator it = resNS.entrySet().iterator();
@@ -985,23 +1000,15 @@ public class ConvertSystem {
 			}
 			Node Pro = nextProcess.getFirstChild().getNextSibling();
 			if(Pro.getNodeName().equals("in")){
-				handleResNP(firstInstr, writer);
+				//handleResNP(firstInstr, writer);
 				handleInRepl(resNS, firstInstr, writer);
 
 			}
 			if(Pro.getNodeName().equals("out")){
-				handleResNP(firstInstr, writer);
+				//handleResNP(firstInstr, writer);
 				handleOutRepl(resNS, firstInstr, writer);
 
 			}
-			if(Pro.getNodeName().equals("parP")){
-				handleParResRepl(firstInstr, Pro, writer);
-				//simplirwma
-			}
-		}
-		if(fInName.equals("parP")){
-			//handleReplPar(firstInstr);
-			//simplirwma
 		}
 		if(fInName.equals("in")){
 			handleInRepl(resNS, firstInstr, writer);
@@ -1528,7 +1535,45 @@ public class ConvertSystem {
 		writer.close();
 
 	}
-
+	public static void printGlobalinConstr(PrintWriter writer){
+	    Iterator it = globalChannels.entrySet().iterator();
+	    while (it.hasNext()) {
+	        Map.Entry pair = (Map.Entry)it.next();
+	        String namen= (String) pair.getKey();
+	        String typename = (String) pair.getValue();
+	        writer.println("\t\t\t " + namen + " = new ChannelValue(); ");
+	        writer.println("\t\t\t " + namen + ".type = \"" + typename +"\" ;");
+	    }
+	}
+	public static void printNewGlobal(PrintWriter writer){
+		 Iterator it = globalChannels.entrySet().iterator();
+		    while (it.hasNext()) {
+		        Map.Entry pair = (Map.Entry)it.next();
+				writer.println("\t public ChannelValue " + pair.getKey() + " ;");
+		    }
+	}
+	public static void ReceiveGlobal(PrintWriter writer){
+		  Iterator it3 = globalChannels.entrySet().iterator();
+		    while (it3.hasNext()) {
+		        Map.Entry pair = (Map.Entry)it3.next();
+				writer.print(" ChannelValue " + pair.getKey());
+				if(it3.hasNext()){
+					writer.print(",");
+				}
+		    }
+	}
+	
+	public static void SendGlobal(PrintWriter writer){
+		 Iterator it2 = globalChannels.entrySet().iterator();
+		    while (it2.hasNext()) {
+		        Map.Entry pair = (Map.Entry)it2.next();
+				writer.print(pair.getKey());
+				if(it2.hasNext()){
+					writer.print(", ");
+				}
+		    }
+	}
+	
 	public void decideItem(Node node, boolean foundGS) throws IOException{
 		NodeList nList = node.getChildNodes(); 
 		if(node.isEqualNode(rootNode)){
@@ -1591,10 +1636,9 @@ public class ConvertSystem {
 	public ArrayList<String> decideGlobals(Node node, ArrayList<String> global){
 		NodeList chi = node.getChildNodes();
 		
-		
 		for(int i = 0; i<chi.getLength(); i++){
 			String name = null;
-			if(chi.item(i).equals("in")){
+			if(chi.item(i).getNodeName().equals("in")){
 				NodeList vhIn = chi.item(i).getChildNodes();
 				for(int j=0; j<vhIn.getLength(); j++){
 					if (vhIn.item(j).getNodeName().equals("subj")){
@@ -1604,7 +1648,7 @@ public class ConvertSystem {
 					}
 				}
 			}
-			if(chi.item(i).equals("out")){
+			if(chi.item(i).getNodeName().equals("out")){
 				String name2=null;
 				NodeList vhIn = chi.item(i).getChildNodes();
 				for(int j=0; j<vhIn.getLength(); j++){
@@ -1622,7 +1666,9 @@ public class ConvertSystem {
 					}
 				}
 			}
-			return global;
+			if(!chi.item(i).getNodeName().equals("#text")){
+				/*return*/ decideGlobals(chi.item(i), global) ;
+			}
 		}
 		
 		return global;
@@ -1636,10 +1682,13 @@ public class ConvertSystem {
 		//for(int b=0; b<dimiourgia.BaseObj.size(); b++){
 		//	myParser.baseTypes.add(dimiourgia.BaseObj.get(b).nameOb);
 		//}
-		//ArrayList<String> inoutch = new ArrayList<String>();
-		//inoutch.addAll(myParser.decideGlobals(myParser.rootNode, inoutch));
-		
-		myParser.decideItem(myParser.rootNode,foundGS);
+		ArrayList<String> inoutch = new ArrayList<String>();
+		inoutch.addAll(myParser.decideGlobals(myParser.rootNode, inoutch));
+		for(int i=0; i<inoutch.size(); i++){
+			myParser.globalChannels.put(inoutch.get(i), "unknown");
+		}
+		System.out.println(myParser.globalChannels);
+		//myParser.decideItem(myParser.rootNode,foundGS);
 		
 
 	}
