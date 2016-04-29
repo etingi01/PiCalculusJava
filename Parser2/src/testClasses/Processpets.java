@@ -21,6 +21,7 @@ public class Processpets implements CSProcess {
 			 play.type = "Tp";
 			 ChannelValue bed = new ChannelValue();
 			 bed.type = "Tb";
+			 String name = "ssdfsf";
 			 bed = (ChannelValue) door.channel.in().read();
 			 System.out.println("ekane in apo to door");
 			 window.channel.out().write( play );

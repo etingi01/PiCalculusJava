@@ -412,7 +412,7 @@ String all="";
 	
 	public static void main(String[] args) throws SAXException, IOException, ParserConfigurationException {
 		// TODO Auto-generated method stub
-		ParseSystemTree myParser = new ParseSystemTree("FilesForXMLPrograms/test3resGSParSresNS.xml");
+		ParseSystemTree myParser = new ParseSystemTree("FilesForXMLPrograms/HouseSystem.xml");
     	myParser.printXML(myParser.rootNode,"");   
 		myParser.printPi(myParser.rootNode,"", 1);   
     	System.out.print(myParser.all);
