@@ -2033,7 +2033,7 @@ HashMap<String,String> resNS = new HashMap<String, String>();
 	}
 	
 	public static void main(String[] args) throws SAXException, IOException, ParserConfigurationException {
-		ConvertSystem myParser = new ConvertSystem("FilesForXMLPrograms/SystemETP.xml");
+		ConvertSystem myParser = new ConvertSystem("FilesForXMLPrograms/diningPhil.xml");
 		ConvertSystem gattr = new ConvertSystem("FilesForXMLPrograms/g_attrubute.xml");
 		myParser.packagename = JOptionPane.showInputDialog(null, "Give the Package of the program");
 		System.out.println(gattr.rootNode.getNodeName());
