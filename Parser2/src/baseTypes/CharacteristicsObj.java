@@ -5,7 +5,6 @@ import java.util.ArrayList;
 public class CharacteristicsObj {
 	public String nameOb; 
 	public ArrayList<ObjChar> atts;
-	
 	public CharacteristicsObj(){
 		nameOb="";
 		atts = new ArrayList();

@@ -3,8 +3,12 @@ import javax.swing.*;
 import javax.swing.event.TableModelEvent;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableModel;
+import javax.swing.text.NumberFormatter;
 
 import com.jgoodies.forms.factories.DefaultComponentFactory;
+
+import GUI.JaPiCa;
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -18,31 +22,88 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.rmi.RemoteException;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 public class CreateBaseTypes {
 	
 	public static ArrayList<CharacteristicsObj> BaseObj;
+	public static ArrayList<String> basetypesN;
+
 	public static int numOfObjects;
 	public CreateBaseTypes(){
 		BaseObj=new ArrayList();
 		numOfObjects=0;
+		basetypesN = new ArrayList<String>();
+
 	}
 	
 	
 	public static  void MenuButtons(int numOb){
-		JFrame fm = new JFrame ("Attributes για Αντικείμενο: " + BaseObj.get(numOb).nameOb);
-	    fm.setLayout( new FlowLayout() );      // set the layout manager
-   	//    fm.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-   	    JButton simpleType = new JButton("Προσθήκη Attribute Απλού Τύπου"); // construct a JButton
-	    JButton ODimT = new JButton("Προσθήκη Μονοδιάστατου Πίνακα");
-	    JButton TDimT = new JButton("Προσθήκη Δυσδιάστατου Πίνακα");
-	    JButton arType = new JButton("Προσθήκη ArrayList");
-	    fm.getContentPane().add(simpleType);
-	    fm.getContentPane().add(ODimT);
-	    fm.getContentPane().add(TDimT);
-	    fm.getContentPane().add(arType);
+		JFrame fm = new JFrame ("Insert the attributes of the Object: " + BaseObj.get(numOb).nameOb);
+	    fm.setLayout( null );      // set the layout manager
+   	    //fm.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+	    //fm.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
+	    fm.addWindowListener(new WindowAdapter()
+        {
+            @Override
+            public void windowClosing(WindowEvent e)
+            {
+            	BaseObj.remove(numOb);
+                System.out.println("Closed");
+                e.getWindow().dispose();
+            }
+        });
+	    
+   	  /*  JButton simpleType = new JButton("Attribute: Primitive Data Type"); // construct a JButton
+	    JButton ODimT = new JButton("Attribute: 1-D table");
+	    JButton TDimT = new JButton("Attribute: 2-D table");
+	    JButton arType = new JButton("Attribute: ArrayList");
+	    JButton finish = new JButton("Save this Object");*/
+	    
+	    
+		Button simpleType = new Button("Attribute: Primitive Data Type");
+		simpleType.setForeground(new Color(255, 255, 255));
+		simpleType.setBackground(new Color(51, 102, 255));
+		simpleType.setBounds(30, 36, 164, 36);
+		fm.getContentPane().add(simpleType);
+
+		Button ODimT = new Button("Attribute: 1-D table");
+		ODimT.setForeground(new Color(255, 255, 255));
+		ODimT.setBackground(new Color(51, 102, 255));
+		ODimT.setBounds(237, 36, 158, 36);
+		fm.getContentPane().add(ODimT);
+
+		Button TDimT = new Button("Attribute: 2-D table");
+		TDimT.setForeground(new Color(255, 255, 255));
+		TDimT.setBackground(new Color(51, 102, 255));
+		TDimT.setBounds(30, 106, 164, 31);
+		fm.getContentPane().add(TDimT);
+		
+		Button arType = new Button("Attribute: ArrayList");
+		arType.setForeground(new Color(255, 255, 255));
+		arType.setBackground(new Color(51, 102, 255));
+		arType.setBounds(237, 106, 158, 31);
+		fm.getContentPane().add(arType);
+		
+		Button finish = new Button("Save this Object");
+		finish.setForeground(new Color(255, 255, 255));
+		finish.setBackground(new Color(255, 102, 102));
+		finish.setBounds(130, 179, 184, 36);
+		fm.getContentPane().add(finish);
+
+	    
+	    
+	    
+	   /* fm.getContentPane().add(simpleType, BorderLayout.NORTH);
+	    fm.getContentPane().add(ODimT, BorderLayout.WEST);
+	    fm.getContentPane().add(TDimT, BorderLayout.EAST);
+	    fm.getContentPane().add(arType, BorderLayout.CENTER);
+	    fm.getContentPane().add(finish, BorderLayout.SOUTH);*/
+
 	    fm.pack();
-   	    fm.setSize( 500, 250);     
+   	    fm.setSize( 450, 300);  
+	    fm.setLocationRelativeTo(null);
+
    	    fm.setVisible( true ); 
    	
    	 simpleType.addActionListener(new ActionListener() {
@@ -68,6 +129,16 @@ public class CreateBaseTypes {
             	makeTTable(numOb);
             }
         });  
+   	finish.addActionListener(new ActionListener() {
+    	
+        public void actionPerformed(ActionEvent e)
+        {
+        	fm.dispose();
+        }
+    });  
+   	
+   	
+   	
    	arType.addActionListener(new ActionListener() {
     	
         public void actionPerformed(ActionEvent e)
@@ -90,28 +161,30 @@ public class CreateBaseTypes {
 		doc.addItem("short");
 		JTextField nameAttr = new JTextField();
 		Object[] message = {
-            	"Όνομα του ArrayList: ", nameAttr,
-            	"Τύπος του ArrayList: ", doc            	
+            	"Name of ArrayList: ", nameAttr,
+            	"Type of ArrayList: ", doc            	
             };
 		
-		int option = JOptionPane.showConfirmDialog(null, message, "Δημιουργία Απλού Τύπου Attribute", JOptionPane.OK_CANCEL_OPTION);
+		int option = JOptionPane.showConfirmDialog(null, message, "ArrayList", JOptionPane.OK_CANCEL_OPTION);
 	    if (option == JOptionPane.OK_OPTION) {
 	    	String typeA = doc.getSelectedItem().toString();
 	    	String nameA = nameAttr.getText();
-
-	    	CharacteristicsObj thisOb = BaseObj.get(numOb);
-	    	
-	    	ObjChar newAtt = new ObjChar();
-
-	    	newAtt.eidosOfAtt=3;
-	    	newAtt.typeOfAtt=typeA;
-	    	newAtt.nameOfAtt=nameA;
-	    	newAtt.DimCol=0;
-	    	newAtt.DimRow=0;
-
-	    	thisOb.atts.add(newAtt);
-
-	    	BaseObj.set(numOb, thisOb);
+	    	while(nameA.equals("")&&(option == JOptionPane.OK_OPTION)){
+	    		option = JOptionPane.showConfirmDialog(null, message, "ArrayList", JOptionPane.OK_CANCEL_OPTION);
+	    		typeA = doc.getSelectedItem().toString();
+		    	nameA = nameAttr.getText();
+	    	}
+		    if (option == JOptionPane.OK_OPTION) {
+		    	CharacteristicsObj thisOb = BaseObj.get(numOb);
+		    	ObjChar newAtt = new ObjChar();
+		    	newAtt.eidosOfAtt=3;
+		    	newAtt.typeOfAtt=typeA;
+		    	newAtt.nameOfAtt=nameA;
+		    	newAtt.DimCol=0;
+		    	newAtt.DimRow=0;
+		    	thisOb.atts.add(newAtt);
+		    	BaseObj.set(numOb, thisOb);
+		    }
 	    }
 
 	}
@@ -126,33 +199,43 @@ public class CreateBaseTypes {
 		doc.addItem("long");
 		doc.addItem("short");
 		JTextField nameAttr = new JTextField();
-		JTextField rows = new JTextField();
-		JTextField cols = new JTextField();
+		//JTextField rows = new JTextField();
+		//JTextField cols = new JTextField();
+		NumberFormat longFormat = NumberFormat.getIntegerInstance();
+		NumberFormatter numberFormatter = new NumberFormatter(longFormat);
+		numberFormatter.setValueClass(Long.class); //optional, ensures you will always get a long value
+		numberFormatter.setAllowsInvalid(false); //this is the key!!
+		numberFormatter.setMinimum(0l); //Optional
 
+		JFormattedTextField rows = new JFormattedTextField(numberFormatter);
+		JFormattedTextField cols = new JFormattedTextField(numberFormatter);
+		
 		Object[] message = {
-            	"Όνομα του 2D πίνακα: ", nameAttr,
-            	"Διαστάσεις - Αρ. Γραμμών: ", rows,
-            	"Διαστάσεις - Αρ. Στηλών: ", cols,
-            	"Τύπος του 2D πίνακα: ", doc            	
+            	"Name of 2D table: ", nameAttr,
+            	"Number of Rows: ", rows,
+            	"Number of Columns: ", cols,
+            	"Type of 2D table: ", doc            	
             };
-		int option = JOptionPane.showConfirmDialog(null, message, "Δημιουργία Απλού Τύπου Attribute", JOptionPane.OK_CANCEL_OPTION);
+		int option = JOptionPane.showConfirmDialog(null, message, "2D TABLE", JOptionPane.OK_CANCEL_OPTION);
 	    if (option == JOptionPane.OK_OPTION) {
 	    	String typeA = doc.getSelectedItem().toString();
 	    	String nameA = nameAttr.getText();
-
-	    	CharacteristicsObj thisOb = BaseObj.get(numOb);
-	    	
-	    	ObjChar newAtt = new ObjChar();
-
-	    	newAtt.eidosOfAtt=2;
-	    	newAtt.typeOfAtt=typeA;
-	    	newAtt.nameOfAtt=nameA;
-	    	newAtt.DimCol= Integer.parseInt(cols.getText());
-	    	newAtt.DimRow=Integer.parseInt(rows.getText());;
-
-	    	thisOb.atts.add(newAtt);
-
-	    	BaseObj.set(numOb, thisOb);
+	    	while((nameA.equals("")||(cols.getText().equals(""))||(rows.getText().equals("")))&&(option == JOptionPane.OK_OPTION)){
+	    		option = JOptionPane.showConfirmDialog(null, message, "2D TABLE", JOptionPane.OK_CANCEL_OPTION);
+	    		typeA = doc.getSelectedItem().toString();
+		    	nameA = nameAttr.getText();	    	
+	    	}
+		    if (option == JOptionPane.OK_OPTION) {
+		    	CharacteristicsObj thisOb = BaseObj.get(numOb);
+		    	ObjChar newAtt = new ObjChar();
+		    	newAtt.eidosOfAtt=2;
+		    	newAtt.typeOfAtt=typeA;
+		    	newAtt.nameOfAtt=nameA;
+		    	newAtt.DimCol= Integer.parseInt(cols.getText());
+		    	newAtt.DimRow=Integer.parseInt(rows.getText());;
+		    	thisOb.atts.add(newAtt);
+		    	BaseObj.set(numOb, thisOb);
+		    }
 	    }
 
 
@@ -168,31 +251,43 @@ public class CreateBaseTypes {
 		doc.addItem("long");
 		doc.addItem("short");
 		JTextField nameAttr = new JTextField();
-		JTextField rows = new JTextField();
+	//	JTextField rows = new JTextField();
 
+		NumberFormat longFormat = NumberFormat.getIntegerInstance();
+
+		NumberFormatter numberFormatter = new NumberFormatter(longFormat);
+		numberFormatter.setValueClass(Long.class);
+		numberFormatter.setAllowsInvalid(false); //this is the key!!
+		numberFormatter.setMinimum(0l); //Optional
+
+		JFormattedTextField rows = new JFormattedTextField(numberFormatter);
+		
+		
 		Object[] message = {
-            	"Όνομα του 1D πίνακα: ", nameAttr,
-            	"Διαστάσεις - Αρ. Γραμμών: ", rows,
-            	"Τύπος του 1D πίνακα: ", doc            	
+            	"Name of 1D table: ", nameAttr,
+            	"Number of Rows: ", rows,
+            	"Type of 1D table: ", doc            	
             };
-		int option = JOptionPane.showConfirmDialog(null, message, "Δημιουργία Απλού Τύπου Attribute", JOptionPane.OK_CANCEL_OPTION);
+		int option = JOptionPane.showConfirmDialog(null, message, "1D TABLE", JOptionPane.OK_CANCEL_OPTION);
 	    if (option == JOptionPane.OK_OPTION) {
 	    	String typeA = doc.getSelectedItem().toString();
 	    	String nameA = nameAttr.getText();
-
-	    	CharacteristicsObj thisOb = BaseObj.get(numOb);
-	    	
-	    	ObjChar newAtt = new ObjChar();
-
-	    	newAtt.eidosOfAtt=1;
-	    	newAtt.typeOfAtt=typeA;
-	    	newAtt.nameOfAtt=nameA;
-	    	newAtt.DimCol= 0;
-	    	newAtt.DimRow=Integer.parseInt(rows.getText());;
-
-	    	thisOb.atts.add(newAtt);
-
-	    	BaseObj.set(numOb, thisOb);
+	    	while((nameA.equals("")||(rows.getText().equals("")))&&(option == JOptionPane.OK_OPTION)){
+	    		option = JOptionPane.showConfirmDialog(null, message, "1D TABLE", JOptionPane.OK_CANCEL_OPTION);
+		    	typeA = doc.getSelectedItem().toString();
+		    	nameA = nameAttr.getText();	    	
+	    	}
+		    if (option == JOptionPane.OK_OPTION) {
+		    	CharacteristicsObj thisOb = BaseObj.get(numOb);
+		    	ObjChar newAtt = new ObjChar();
+		    	newAtt.eidosOfAtt=1;
+		    	newAtt.typeOfAtt=typeA;
+		    	newAtt.nameOfAtt=nameA;
+		    	newAtt.DimCol= 0;
+		    	newAtt.DimRow=Integer.parseInt(rows.getText());;
+		    	thisOb.atts.add(newAtt);
+		    	BaseObj.set(numOb, thisOb);
+		    }
 	    }
 
 
@@ -211,33 +306,36 @@ public class CreateBaseTypes {
 		doc.addItem("short");
 		JTextField nameAttr = new JTextField();
 		Object[] message = {
-            	"Όνομα του attribute: ", nameAttr,
-            	"Τύπος του attribute: ", doc            	
+            	"Name of attribute variable: ", nameAttr,
+            	"Type of attribute variable: ", doc            	
             };
 		
-		int option = JOptionPane.showConfirmDialog(null, message, "Δημιουργία Απλού Τύπου Attribute", JOptionPane.OK_CANCEL_OPTION);
+		int option = JOptionPane.showConfirmDialog(null, message, "Primitive Data Type", JOptionPane.OK_CANCEL_OPTION);
 	    if (option == JOptionPane.OK_OPTION) {
 	    	String typeA = doc.getSelectedItem().toString();
 	    	String nameA = nameAttr.getText();
-
-	    	CharacteristicsObj thisOb = BaseObj.get(numOb);
-	    	
-	    	ObjChar newAtt = new ObjChar();
-
-	    	newAtt.eidosOfAtt=0;
-	    	newAtt.typeOfAtt=typeA;
-	    	newAtt.nameOfAtt=nameA;
-	    	newAtt.DimCol=0;
-	    	newAtt.DimRow=0;
-
-	    	thisOb.atts.add(newAtt);
-
-	    	BaseObj.set(numOb, thisOb);
+	    	while(nameA.equals("")&&(option == JOptionPane.OK_OPTION)){
+	    		option = JOptionPane.showConfirmDialog(null, message, "Primitive Data Type", JOptionPane.OK_CANCEL_OPTION);
+		    	typeA = doc.getSelectedItem().toString();
+		    	nameA = nameAttr.getText();
+	    	}
+		    if (option == JOptionPane.OK_OPTION) {
+		    	CharacteristicsObj thisOb = BaseObj.get(numOb);	    	
+		    	ObjChar newAtt = new ObjChar();
+		    	newAtt.eidosOfAtt=0;
+		    	newAtt.typeOfAtt=typeA;
+		    	newAtt.nameOfAtt=nameA;
+		    	newAtt.DimCol=0;
+		    	newAtt.DimRow=0;
+		    	thisOb.atts.add(newAtt);
+		    	BaseObj.set(numOb, thisOb);
+		    }
 	    }
 	}
 	public static void createNewClass() throws IOException{
 		System.out.println("irthe edw");
 		for (int i=0; i<BaseObj.size(); i++){
+			basetypesN.add(BaseObj.get(i).nameOb);
 			String fileName= BaseObj.get(i).nameOb + ".java";
 			@SuppressWarnings("resource")
 			PrintWriter writer = new PrintWriter(fileName, "UTF-8");
@@ -333,16 +431,18 @@ public class CreateBaseTypes {
 	
 	
 	public static void AddBaseObject(){
+
 		JFrame fbase = new JFrame();
-		fbase.getContentPane().setBackground(new Color(135, 206, 250));
-	    fbase.getContentPane().setLayout(null);     // set the layout manager
+	    fbase.setLayout(null);     // set the layout manager
+
+		fbase.getContentPane().setBackground(new Color(240, 240, 240));
+		fbase.setTitle("JaPiCa - PiCalculus to Java");
    	    fbase.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		
-   	    JLabel lblNewJgoodiesTitle = DefaultComponentFactory.getInstance().createTitle("Base Types of the System");
+		JLabel lblNewJgoodiesTitle = new JLabel();
+		lblNewJgoodiesTitle.setText("Base Types of the System");
 		lblNewJgoodiesTitle.setForeground(new Color(0, 0, 0));
 		lblNewJgoodiesTitle.setFont(new Font("Dialog", Font.BOLD, 16));
 		lblNewJgoodiesTitle.setBounds(10, 0, 231, 29);
-		fbase.getContentPane().add(lblNewJgoodiesTitle);
 		 //JButton objAdd = new JButton("Προσθήκη Αντικειμένου");
 		Button objAdd = new Button("Insert Base Type");
 		objAdd.setForeground(new Color(255, 255, 255));
@@ -351,29 +451,42 @@ public class CreateBaseTypes {
 		objAdd.setBackground(new Color(51, 102, 255));
 		objAdd.setBounds(154, 50, 140, 54);
 
-		Button term = new Button("FINISH");
+		Button term = new Button("Create the Objects' Classes");
 		term.setForeground(new Color(255, 255, 255));
 		term.setFont(new Font("Dialog", Font.PLAIN, 12));
 		term.setBackground(new Color(255, 102, 102));
 		term.setBounds(119, 168, 207, 29);
+		//term.addActionListener();
+		fbase.getContentPane().add(lblNewJgoodiesTitle);
 
 	    fbase.getContentPane().add(objAdd);
 	    fbase.getContentPane().add(term);
 	    //
 	    fbase.pack();
+	    fbase.setSize(450, 250);
+   	    fbase.setLocationRelativeTo(null);
 	    fbase.setVisible( true ); 
 
 	    objAdd.addActionListener(new ActionListener() {
 	    	 
             public void actionPerformed(ActionEvent e)
             {
-            	String nameNewO = JOptionPane.showInputDialog(null,"Δώστε το ονομα του καινούργιου αντικειμένου:");
-            	CharacteristicsObj obj1 = new CharacteristicsObj();
-            	numOfObjects++;
-            	obj1.nameOb=nameNewO;
-            	BaseObj.add(obj1);
-
-            	MenuButtons(numOfObjects-1);
+            	String nameNewO = JOptionPane.showInputDialog(null,"Give the name of the new object:");
+            	if(nameNewO!=null){
+            	while(nameNewO.equals("")){
+                	nameNewO = JOptionPane.showInputDialog(null,"Give the name of the new object:");
+                	if(nameNewO==null)
+                		break;
+            	}
+            	if(nameNewO!=null){
+	            	CharacteristicsObj obj1 = new CharacteristicsObj();
+	            	numOfObjects++;
+	            	obj1.nameOb=nameNewO;
+	            	BaseObj.add(obj1);
+	
+	            	MenuButtons(numOfObjects-1);
+            	}
+            	}
             }
         });  
 	    term.addActionListener(new ActionListener() {
@@ -382,6 +495,7 @@ public class CreateBaseTypes {
             {
             	try {
 					createNewClass();
+					fbase.dispose();
 				} catch (FileNotFoundException | UnsupportedEncodingException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();

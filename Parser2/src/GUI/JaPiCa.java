@@ -30,6 +30,7 @@ import java.awt.Button;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import javax.swing.JTable;
+import java.awt.SystemColor;
 
 public class JaPiCa {
 
@@ -66,9 +67,10 @@ public class JaPiCa {
 	@SuppressWarnings("deprecation")
 	private void initialize() {
 		frmJapicaPi = new JFrame();
+		frmJapicaPi.setBackground(new Color(0, 128, 128));
 		nextScreen = new JFrame();
 		nextScreen.getContentPane().setBackground(new Color(135, 206, 250));
-		frmJapicaPi.getContentPane().setBackground(new Color(135, 206, 250));
+		frmJapicaPi.getContentPane().setBackground(new Color(100, 149, 237));
 		frmJapicaPi.setTitle("JaPiCa - PiCalculus to Java");
 		frmJapicaPi.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frmJapicaPi.getContentPane().setLayout(null);
@@ -83,7 +85,7 @@ public class JaPiCa {
 		button.setForeground(new Color(255, 255, 255));
 		button.setFont(new Font("Dialog", Font.BOLD, 12));
 		button.setActionCommand("");
-		button.setBackground(new Color(51, 102, 255));
+		button.setBackground(new Color(152, 251, 152));
 		button.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				//frmJapicaPi.getContentPane().remove(textField);

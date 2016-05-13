@@ -1,4 +1,5 @@
 package SystemType;
+import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.JTree;
 import javax.swing.tree.TreeNode;
@@ -2040,13 +2041,16 @@ HashMap<String,String> resNS = new HashMap<String, String>();
 		HashMap<String, String> g_attr = takeGattr(gattr.rootNode);
 		System.out.println(g_attr);
 		boolean foundGS=false;
-		//CreateBaseTypes dimiourgia = new CreateBaseTypes();		
-		//dimiourgia.AddBaseObject();
-		//for(int b=0; b<dimiourgia.BaseObj.size(); b++){
-		//	myParser.baseTypes.add(dimiourgia.BaseObj.get(b).nameOb);
-		//}
+		CreateBaseTypes dimiourgia = new CreateBaseTypes();		
+		dimiourgia.AddBaseObject();
+		for(int b=0; b<dimiourgia.BaseObj.size(); b++){
+			System.out.println(dimiourgia.basetypesN.get(b));
+			myParser.baseTypes.add(dimiourgia.basetypesN.get(b));
+		}
 		
-		myParser.baseTypes.add("loc");
+		
+		
+		
 		ArrayList<String> inoutch = new ArrayList<String>();
 		inoutch.addAll(myParser.decideGlobals(myParser.rootNode, inoutch));
 		myParser.globalChannels.putAll(g_attr);
