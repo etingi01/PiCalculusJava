@@ -8,6 +8,7 @@ import javax.swing.text.NumberFormatter;
 import com.jgoodies.forms.factories.DefaultComponentFactory;
 
 import GUI.JaPiCa;
+import SystemType.GUIselFiles;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -41,8 +42,6 @@ public class CreateBaseTypes {
 	public static  void MenuButtons(int numOb){
 		JFrame fm = new JFrame ("Insert the attributes of the Object: " + BaseObj.get(numOb).nameOb);
 	    fm.setLayout( null );      // set the layout manager
-   	    //fm.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-	    //fm.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
 	    fm.addWindowListener(new WindowAdapter()
         {
             @Override
@@ -53,13 +52,6 @@ public class CreateBaseTypes {
                 e.getWindow().dispose();
             }
         });
-	    
-   	  /*  JButton simpleType = new JButton("Attribute: Primitive Data Type"); // construct a JButton
-	    JButton ODimT = new JButton("Attribute: 1-D table");
-	    JButton TDimT = new JButton("Attribute: 2-D table");
-	    JButton arType = new JButton("Attribute: ArrayList");
-	    JButton finish = new JButton("Save this Object");*/
-	    
 	    
 		Button simpleType = new Button("Attribute: Primitive Data Type");
 		simpleType.setForeground(new Color(255, 255, 255));
@@ -90,16 +82,6 @@ public class CreateBaseTypes {
 		finish.setBackground(new Color(255, 102, 102));
 		finish.setBounds(130, 179, 184, 36);
 		fm.getContentPane().add(finish);
-
-	    
-	    
-	    
-	   /* fm.getContentPane().add(simpleType, BorderLayout.NORTH);
-	    fm.getContentPane().add(ODimT, BorderLayout.WEST);
-	    fm.getContentPane().add(TDimT, BorderLayout.EAST);
-	    fm.getContentPane().add(arType, BorderLayout.CENTER);
-	    fm.getContentPane().add(finish, BorderLayout.SOUTH);*/
-
 	    fm.pack();
    	    fm.setSize( 450, 300);  
 	    fm.setLocationRelativeTo(null);
@@ -414,15 +396,10 @@ public class CreateBaseTypes {
 					writer.println( temp.nameOfAtt + "[n][n1] = parameter[n][n1]; " );
 					writer.println("}");
 					writer.println("}");
-					writer.println("}");
-
-					
+					writer.println("}");					
 					break;
 				}
 			}
-			
-			
-			
 			writer.println("}");
 			writer.close();
 			System.out.println(BaseObj.get(i).nameOb);
@@ -451,7 +428,7 @@ public class CreateBaseTypes {
 		objAdd.setBackground(new Color(51, 102, 255));
 		objAdd.setBounds(154, 50, 140, 54);
 
-		Button term = new Button("Create the Objects' Classes");
+		Button term = new Button("Next");
 		term.setForeground(new Color(255, 255, 255));
 		term.setFont(new Font("Dialog", Font.PLAIN, 12));
 		term.setBackground(new Color(255, 102, 102));
@@ -461,7 +438,7 @@ public class CreateBaseTypes {
 
 	    fbase.getContentPane().add(objAdd);
 	    fbase.getContentPane().add(term);
-	    //
+	    
 	    fbase.pack();
 	    fbase.setSize(450, 250);
    	    fbase.setLocationRelativeTo(null);
@@ -496,6 +473,8 @@ public class CreateBaseTypes {
             	try {
 					createNewClass();
 					fbase.dispose();
+					GUIselFiles showF = new GUIselFiles(basetypesN);
+					showF.askFiles();
 				} catch (FileNotFoundException | UnsupportedEncodingException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();

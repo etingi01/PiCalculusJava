@@ -31,15 +31,15 @@ import java.util.ArrayList;
 
 public class ConvertSystem {
 	
-	private static String packagename = "";
-	private Document doc;
-	private Node rootNode;
-	private Node ParPNode;
+	//private static String packagename = "";
+	public Document doc;
+	public Node rootNode;
+	public Node ParPNode;
 	//private static int processNewGP = 0;
-	private static int ParPproc = 0;
-	private static int ReplP=0;
-	private static ArrayList<String> baseTypes = new ArrayList<String>();
-	private static HashMap<String, String> globalChannels = new HashMap<String, String>();
+	public static int ParPproc = 0;
+	public static int ReplP=0;
+	public static ArrayList<String> baseTypes = new ArrayList<String>();
+	public static HashMap<String, String> globalChannels = new HashMap<String, String>();
 	public ConvertSystem(String file) throws ParserConfigurationException, SAXException, IOException {
 		File inputFile = new File(file);
 	    DocumentBuilderFactory dbFactory 
@@ -273,7 +273,7 @@ public class ConvertSystem {
 		@SuppressWarnings("resource")
 		PrintWriter writer = new PrintWriter(fileName, "UTF-8");
 		new File(fileName).createNewFile();	
-		writer.println("package " + packagename + ";");
+		//writer.println("package " + packagename + ";");
 		writer.println("import org.jcsp.lang.*;");
 		writer.println("import javax.swing.*;");
 		writer.println("import java.awt.*;");
@@ -389,7 +389,7 @@ public class ConvertSystem {
 		@SuppressWarnings("resource")
 		PrintWriter writer = new PrintWriter(fileName, "UTF-8");
 		new File(fileName).createNewFile();		
-		writer.println("package " + packagename + ";");
+		//writer.println("package " + packagename + ";");
 
 		writer.println("import org.jcsp.lang.*;");
 		writer.println("import java.io.*;");
@@ -583,7 +583,7 @@ public class ConvertSystem {
 		@SuppressWarnings("resource")
 		PrintWriter writer = new PrintWriter(fileName, "UTF-8");
 		new File(fileName).createNewFile();		
-		writer.println("package " + packagename + ";");
+		//writer.println("package " + packagename + ";");
 
 		writer.println("import org.jcsp.lang.*;");
 		writer.println("import java.io.*;");
@@ -1462,7 +1462,7 @@ HashMap<String,String> resNS = new HashMap<String, String>();
 		@SuppressWarnings("resource")
 		PrintWriter writer = new PrintWriter(fileName, "UTF-8");
 		new File(fileName).createNewFile();
-		writer.println("package " + packagename + ";");
+		//writer.println("package " + packagename + ";");
 
 		writer.println("import org.jcsp.lang.*;");
 		writer.println("import java.io.*;");
@@ -1674,7 +1674,7 @@ HashMap<String,String> resNS = new HashMap<String, String>();
 		@SuppressWarnings("resource")
 		PrintWriter writer = new PrintWriter(fileName, "UTF-8");
 		new File(fileName).createNewFile();
-		writer.println("package " + packagename + ";");
+		//writer.println("package " + packagename + ";");
 
 		writer.println("import org.jcsp.lang.*;");
 		writer.println("import java.io.*;");
@@ -1752,7 +1752,7 @@ HashMap<String,String> resNS = new HashMap<String, String>();
 		@SuppressWarnings("resource")
 		PrintWriter writer = new PrintWriter(fileName, "UTF-8");
 		new File(fileName).createNewFile();
-		writer.println("package " + packagename + ";");
+		//writer.println("package " + packagename + ";");
 
 		writer.println("import org.jcsp.lang.*;");
 		writer.println("import java.io.*;");
@@ -1829,7 +1829,7 @@ HashMap<String,String> resNS = new HashMap<String, String>();
 		@SuppressWarnings("resource")
 		PrintWriter writer = new PrintWriter(fileName, "UTF-8");
 		new File(fileName).createNewFile();
-		writer.println("package " + packagename + ";");
+		//writer.println("package " + packagename + ";");
 
 		writer.println("import org.jcsp.lang.*;");
 		writer.println("import java.io.*;");
@@ -2015,7 +2015,7 @@ HashMap<String,String> resNS = new HashMap<String, String>();
 		
 	}
 	
-	public static HashMap<String, String> takeGattr(Node r){
+	public HashMap<String, String> takeGattr(Node r){
 		HashMap<String, String> mapAttr = new HashMap<String, String>();
 		String word = r.getTextContent();
 		String[] names =word.split(",");
@@ -2036,9 +2036,9 @@ HashMap<String,String> resNS = new HashMap<String, String>();
 	public static void main(String[] args) throws SAXException, IOException, ParserConfigurationException {
 		ConvertSystem myParser = new ConvertSystem("FilesForXMLPrograms/diningPhil.xml");
 		ConvertSystem gattr = new ConvertSystem("FilesForXMLPrograms/g_attrubute.xml");
-		myParser.packagename = JOptionPane.showInputDialog(null, "Give the Package of the program");
+		//myParser.packagename = JOptionPane.showInputDialog(null, "Give the Package of the program");
 		System.out.println(gattr.rootNode.getNodeName());
-		HashMap<String, String> g_attr = takeGattr(gattr.rootNode);
+		HashMap<String, String> g_attr = gattr.takeGattr(gattr.rootNode);
 		System.out.println(g_attr);
 		boolean foundGS=false;
 		CreateBaseTypes dimiourgia = new CreateBaseTypes();		
@@ -2047,10 +2047,6 @@ HashMap<String,String> resNS = new HashMap<String, String>();
 			System.out.println(dimiourgia.basetypesN.get(b));
 			myParser.baseTypes.add(dimiourgia.basetypesN.get(b));
 		}
-		
-		
-		
-		
 		ArrayList<String> inoutch = new ArrayList<String>();
 		inoutch.addAll(myParser.decideGlobals(myParser.rootNode, inoutch));
 		myParser.globalChannels.putAll(g_attr);
