@@ -37,8 +37,7 @@ public class CreateBaseTypes {
 		basetypesN = new ArrayList<String>();
 
 	}
-	
-	
+
 	public static  void MenuButtons(int numOb){
 		JFrame fm = new JFrame ("Insert the attributes of the Object: " + BaseObj.get(numOb).nameOb);
 	    fm.setLayout( null );      // set the layout manager
@@ -489,10 +488,7 @@ public class CreateBaseTypes {
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		CreateBaseTypes dimiourgia = new CreateBaseTypes();
-		
 		dimiourgia.AddBaseObject();
-		
-	
 	}
 
 }

@@ -2,7 +2,9 @@ package SystemType;
 
 import java.awt.Button;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.Insets;
 import java.awt.Label;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -13,6 +15,8 @@ import java.util.HashMap;
 
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -91,7 +95,8 @@ public class GUIselFiles {
 					return;
 				}
 				try {
-					convStage();
+					frmSelectFiles.dispose();
+					checkXML();
 				} catch (ParserConfigurationException | SAXException | IOException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
@@ -162,6 +167,82 @@ public class GUIselFiles {
 		System.out.println(myParser.globalChannels);
 		myParser.decideItem(myParser.rootNode,foundGS);
 		
+	}
+	
+	public void checkXML() throws ParserConfigurationException, SAXException, IOException{
+		checkXMLSyntax checked = new checkXMLSyntax(this.systemfile, this.gattrfile, this.basetypesN);
+		checked.printXML(checked.rootNode, "");
+		if(checked.mist){
+		JTextArea textArea = new JTextArea(checked.outTree);
+		JScrollPane scrollPane = new JScrollPane(textArea);  
+		textArea.setLineWrap(true);  
+		textArea.setWrapStyleWord(true); 
+		scrollPane.setPreferredSize( new Dimension( 500, 500 ) );
+		String[] options = new String[] {"Insert new XML file", "Exit"};
+		int res = JOptionPane.showOptionDialog(
+			    null, 
+			    scrollPane,
+			    "Error!", 
+			    JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE,
+		        null, options, options[0]);
+		if(res == 0){
+    		this.systemGiven=false;
+    		this.gattrGiven=false;
+			GUIselFiles showF = new GUIselFiles(checked.baset);
+			showF.askFiles();
+    	}else{
+    		if(res==1)
+    			System.exit(0);
+    	}
+		}else{
+			confirmTyping();
+		}
+	}
+	
+	
+	
+	public void confirmTyping() throws ParserConfigurationException, SAXException, IOException{
+		ParseSystemTree myParser = new ParseSystemTree(this.systemfile, this.gattrfile, this.basetypesN);
+    	myParser.printXML(myParser.rootNode,"");   
+		myParser.printPi(myParser.rootNode,"", 1);   
+    	System.out.print(myParser.all);
+    	JTextArea msg = new JTextArea(myParser.all);
+    	msg.setLineWrap(true);
+    	Insets m = new Insets(5,5,5,5);
+    	msg.setMargin(m);
+    	msg.setWrapStyleWord(true);
+    	msg.setSize(650, 150);
+   		msg.setLineWrap(true);
+		msg.setWrapStyleWord(true);
+		msg.setEditable(false);
+		Font f = new Font("Dialog", Font.BOLD, 11);
+		msg.setFont(f);
+    	JScrollPane scrollPane = new JScrollPane(msg);
+    	int dialogResult = JOptionPane.showConfirmDialog(null, scrollPane, "Is this your modelled system in Pi-Calculus Syntax?",JOptionPane.YES_NO_OPTION);  	
+    	if(dialogResult == JOptionPane.YES_OPTION){
+    		convStage();
+    	}
+    	if(dialogResult == JOptionPane.NO_OPTION){
+    		String[] options = new String[] {"Insert new XML file", "Exit"};
+    		int res = JOptionPane.showOptionDialog(
+    			    null, 
+    			    "Do you want to insert a new XML file or exit program?",
+    			    "Question", 
+    			    JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE,
+    		        null, options, options[0]);
+    		if(res==0){
+        		this.systemGiven=false;
+        		this.gattrGiven=false;
+    			GUIselFiles showF = new GUIselFiles(myParser.basetype);
+    			showF.askFiles();
+
+    		}else{
+    			if(res==1)
+    				System.exit(0);
+    		}
+    		
+    		
+    	}
 	}
 	
 	public void askFiles(){
@@ -236,7 +317,8 @@ public class GUIselFiles {
 					return;
 				}
 				try {
-					convStage();
+					frmSelectFiles.dispose();
+					checkXML();
 				} catch (ParserConfigurationException | SAXException | IOException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();

@@ -13,10 +13,13 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Button;
 import java.awt.SystemColor;
+import javax.swing.JTextField;
+import javax.swing.JLabel;
 
 public class nextScreen {
 
-	private JFrame frame;
+	private JFrame frmPiCalculus;
+	private JTextField textField;
 
 	/**
 	 * Launch the application.
@@ -26,7 +29,7 @@ public class nextScreen {
 			public void run() {
 				try {
 					nextScreen window = new nextScreen();
-					window.frame.setVisible(true);
+					window.frmPiCalculus.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -45,45 +48,34 @@ public class nextScreen {
 	 * Initialize the contents of the frame.
 	 */
 	private void initialize() {
-		frame = new JFrame();
-		frame.getContentPane().setForeground(new Color(255, 255, 255));
-		frame.getContentPane().setName("Attributes of Base Types");
-		frame.setBounds(100, 100, 450, 300);
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.getContentPane().setLayout(null);
+		frmPiCalculus = new JFrame();
+		frmPiCalculus.setTitle("Pi - Calculus Syntax");
+		frmPiCalculus.getContentPane().setForeground(new Color(255, 255, 255));
+		frmPiCalculus.getContentPane().setName("Attributes of Base Types");
+		frmPiCalculus.setBounds(100, 100, 450, 300);
+		frmPiCalculus.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frmPiCalculus.getContentPane().setLayout(null);
 		
-		Button button_2 = new Button("Attribute: Primitive Data Type");
-		button_2.setForeground(new Color(255, 255, 255));
-		button_2.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-			}
-		});
-		button_2.setBackground(new Color(0, 204, 255));
-		button_2.setBounds(30, 36, 164, 36);
-		frame.getContentPane().add(button_2);
-		
-		Button button_3 = new Button("Attribute: 1-D table");
-		button_3.setForeground(new Color(255, 255, 255));
-		button_3.setBackground(new Color(0, 204, 255));
-		button_3.setBounds(237, 36, 158, 36);
-		frame.getContentPane().add(button_3);
-		
-		Button button_4 = new Button("Attribute: 2-D table");
+		Button button_4 = new Button("Yes");
 		button_4.setForeground(new Color(255, 255, 255));
 		button_4.setBackground(new Color(0, 204, 255));
-		button_4.setBounds(30, 106, 164, 31);
-		frame.getContentPane().add(button_4);
+		button_4.setBounds(30, 188, 164, 31);
+		frmPiCalculus.getContentPane().add(button_4);
 		
-		Button button_5 = new Button("Attribute: ArrayList");
+		Button button_5 = new Button("No");
 		button_5.setForeground(new Color(255, 255, 255));
 		button_5.setBackground(new Color(0, 204, 255));
-		button_5.setBounds(237, 106, 158, 31);
-		frame.getContentPane().add(button_5);
+		button_5.setBounds(237, 188, 158, 31);
+		frmPiCalculus.getContentPane().add(button_5);
 		
-		Button button_6 = new Button("Save this Object");
-		button_6.setForeground(new Color(255, 255, 255));
-		button_6.setBackground(new Color(0, 204, 255));
-		button_6.setBounds(130, 179, 184, 36);
-		frame.getContentPane().add(button_6);
+		textField = new JTextField();
+		textField.setBounds(30, 63, 365, 107);
+		frmPiCalculus.getContentPane().add(textField);
+		textField.setColumns(10);
+		
+		JLabel lblNewLabel = new JLabel("Is this your modelled system in Pi-Calculus Syntax?");
+		lblNewLabel.setFont(new Font("Tahoma", Font.BOLD, 11));
+		lblNewLabel.setBounds(30, 11, 298, 41);
+		frmPiCalculus.getContentPane().add(lblNewLabel);
 	}
 }
